@@ -1,0 +1,6 @@
+{
+  "name": "Kal (ቃል) መጽሐፍ ቅዱስ",
+  "description": "Kal (ቃል) Holy Bible — የወንጌላዊ መጽሐፍ ቅዱስ ንባብ፣ ጥናት፣ የቲኦሎጂ ትንታኔ (Theological Exegesis) እና ያለ ኢንተርኔት (Offline PWA) በማስታወሻዎች ማንበቢያ መተግበሪያ በሁለት ቋንቋ (Amharic & English)።",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
