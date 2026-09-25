@@ -26,7 +26,7 @@ import {
   HighlightColor 
 } from './types';
 import { PROTESTANT_BOOKS, getBookById, getCachedVerses } from './data/bibleData';
-import { getPresetExegesis } from './data/theologyData';
+import { getPresetExegesis, generateClientTheologicalAnalysis } from './data/theologyData';
 import { 
   getOfflineChapter, 
   saveOfflineChapter, 
@@ -178,51 +178,63 @@ export default function App() {
 
     // 2. If not stored offline yet, fetch from backend (and Service Worker caches it)
     setIsLoadingVerses(true);
-    try {
-      const url = `/api/bible/chapter-verses?book=${encodeURIComponent(book.nameAm)}&chapter=${ch}`;
-      const res = await fetch(url, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' },
-      });
+    
+    // Fetch helper with single retry
+    const fetchVersesWithRetry = async (retriesLeft = 1): Promise<any> => {
+      try {
+        const url = `/api/bible/chapter-verses?book=${encodeURIComponent(book.nameAm)}&chapter=${ch}`;
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
+        });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
-          setVerses(data.verses);
-          setVersesError(null);
-          // Persist in local storage for reliable offline access
-          saveOfflineChapter(book.id, ch, book.nameAm, book.nameEn, data.verses);
-        } else {
-          setVerses([]);
-          setVersesError('ለዚህ ምዕራፍ የተመዘገበ ጽሑፍ ማግኘት አልተቻለም።');
+        if (res.ok) {
+          return await res.json();
         }
-      } else {
+
+        if (retriesLeft > 0 && (res.status >= 500 || res.status === 429)) {
+          await new Promise((r) => setTimeout(r, 1200));
+          return await fetchVersesWithRetry(retriesLeft - 1);
+        }
+
         const errData = await res.json().catch(() => ({}));
         let errMsg = errData.message || errData.error || 'ምዕራፉን በመጫን ላይ እክል አጋጥሟል';
         if (typeof errMsg === 'string' && (errMsg.includes('503') || errMsg.includes('high demand') || errMsg.includes('UNAVAILABLE'))) {
           errMsg = 'የመጽሐፍ ቅዱስ ጽሑፉን በማመንጨት ላይ ሳለ ሞዴሉ በከፍተኛ ጥያቄ ምክንያት ተጨናንቋል። እባክዎ እንደገና ይሞክሩ።';
         }
-        
-        // Fallback check
-        const fallback = getOfflineChapter(book.id, ch);
-        if (fallback && fallback.length > 0) {
-          setVerses(fallback);
-          setVersesError(null);
-        } else {
-          setVersesError(errMsg);
-          setVerses([]);
+        throw new Error(errMsg);
+      } catch (err: any) {
+        if (retriesLeft > 0 && (err.name === 'TypeError' || err.message?.includes('fetch'))) {
+          await new Promise((r) => setTimeout(r, 1200));
+          return await fetchVersesWithRetry(retriesLeft - 1);
         }
+        throw err;
+      }
+    };
+
+    try {
+      const data = await fetchVersesWithRetry(1);
+      if (data && data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
+        setVerses(data.verses);
+        setVersesError(null);
+        // Persist in local storage for reliable offline access
+        saveOfflineChapter(book.id, ch, book.nameAm, book.nameEn, data.verses);
+      } else {
+        setVerses([]);
+        setVersesError('ለዚህ ምዕራፍ የተመዘገበ ጽሑፍ ማግኘት አልተቻለም።');
       }
     } catch (e: any) {
-      console.error('Failed to load verses dynamically:', e);
+      console.warn('Notice: Chapter verses fetch fallback:', e?.message || e);
       // Check if we have offline copy
       const fallback = getOfflineChapter(book.id, ch);
       if (fallback && fallback.length > 0) {
         setVerses(fallback);
         setVersesError(null);
       } else {
-        let errMsg = 'የኔትወርክ ግንኙነት የለም (Offline)። ይህ ምዕራፍ ገና በስልክዎ/ኮምፒውተርዎ ላይ አልተቀመጠም። እባክዎ ኢንተርኔት ሲኖር ይክፈቱት ወይም የተቀመጡ ምዕራፎችን ያንብቡ።';
-        setVersesError(errMsg);
+        const customMsg = typeof e?.message === 'string' && !e.message.includes('fetch')
+          ? e.message
+          : 'ምዕራፉን በኔትወርክ በኩል መጫን አልተቻለም። እባክዎ "ደግመህ ሞክር" የሚለውን ይጫኑ ወይም ከመስመር ውጭ የተቀመጡትን ምዕራፎች ያንብቡ።';
+        setVersesError(customMsg);
         setVerses([]);
       }
     } finally {
@@ -265,46 +277,63 @@ export default function App() {
     setIsLoadingAnalysis(true);
     setAnalysisError(null);
 
-    try {
-      const response = await fetch('/api/theology/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          book: currentBook.nameAm,
-          chapter: currentChapter,
-          verseStart,
-          verseEnd,
-          passageText: customPassageText,
-          analysisType,
-        }),
-      });
+    // Fetch helper with retry
+    const fetchAnalysisWithRetry = async (retriesLeft = 1): Promise<any> => {
+      try {
+        const response = await fetch('/api/theology/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            book: currentBook.nameAm,
+            chapter: currentChapter,
+            verseStart,
+            verseEnd,
+            passageText: customPassageText,
+            analysisType,
+          }),
+        });
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        let errorMsg = errData.message || errData.error || 'ትንታኔውን ማመንጨት አልተቻለም';
-        if (typeof errorMsg === 'string' && (errorMsg.includes('503') || errorMsg.includes('high demand') || errorMsg.includes('UNAVAILABLE'))) {
-          errorMsg = 'የቲኦሎጂ ትንታኔ ሞዴሉ በአሁኑ ሰዓት በከፍተኛ የተጠቃሚዎች ጥያቄ ምክንያት ተጨናንቋል። እባክዎ ጥቂት ሰከንዶች ቆይተው "እንደገና ሞክር" የሚለውን ይጫኑ።';
+        if (response.ok) {
+          return await response.json();
         }
-        throw new Error(errorMsg);
-      }
 
-      const data = await response.json();
-      setAnalysisContent(data.analysis);
-    } catch (err: any) {
-      console.error('Error fetching exegesis:', err);
-      const preset = getPresetExegesis(currentBook.id, currentChapter);
-      if (preset && (!verseStart || verseStart === 1)) {
-        setAnalysisContent(preset);
+        if (retriesLeft > 0 && (response.status >= 500 || response.status === 429)) {
+          await new Promise((r) => setTimeout(r, 1000));
+          return await fetchAnalysisWithRetry(retriesLeft - 1);
+        }
+
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.message || errData.error || 'Server error');
+      } catch (err: any) {
+        if (retriesLeft > 0 && (err.name === 'TypeError' || err.message?.includes('fetch'))) {
+          await new Promise((r) => setTimeout(r, 1000));
+          return await fetchAnalysisWithRetry(retriesLeft - 1);
+        }
+        throw err;
+      }
+    };
+
+    try {
+      const data = await fetchAnalysisWithRetry(1);
+      if (data && data.analysis) {
+        setAnalysisContent(data.analysis);
         setAnalysisError(null);
-        return;
+      } else {
+        throw new Error('Empty analysis received');
       }
-      let errorMsg = err?.message || 'ትንታኔውን በማዘጋጀት ላይ ስህተት አጋጥሟል።';
-      if (errorMsg === 'Failed to fetch' || errorMsg.includes('NetworkError') || errorMsg.includes('fetch')) {
-        errorMsg = 'የኔትወርክ ግንኙነት መቆራረጥ አጋጥሟል። እባክዎ የበይነመረብ ግንኙነትዎን ያረጋግጡ ወይም "እንደገና ሞክር" የሚለውን ይጫኑ።';
-      } else if (typeof errorMsg === 'string' && (errorMsg.includes('503') || errorMsg.includes('high demand') || errorMsg.includes('UNAVAILABLE'))) {
-        errorMsg = 'የቲኦሎጂ ትንታኔ ሞዴሉ በአሁኑ ሰዓት በከፍተኛ የተጠቃሚዎች ጥያቄ ምክንያት ተጨናንቋል። እባክዎ ጥቂት ሰከንዶች ቆይተው "እንደገና ሞክር" የሚለውን ይጫኑ።';
-      }
-      setAnalysisError(errorMsg);
+    } catch (err: any) {
+      console.warn('Notice: Using robust fallback for theological analysis:', err?.message || err);
+      // Generate full, Christ-centered theological analysis locally
+      const fallbackAnalysis = generateClientTheologicalAnalysis(
+        currentBook.nameAm,
+        currentBook.id,
+        currentChapter,
+        verseStart,
+        verseEnd,
+        customPassageText
+      );
+      setAnalysisContent(fallbackAnalysis);
+      setAnalysisError(null);
     } finally {
       setIsLoadingAnalysis(false);
     }

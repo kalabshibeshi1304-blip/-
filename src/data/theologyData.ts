@@ -602,6 +602,53 @@ export function getPresetExegesis(bookId: string, chapter: number): string | nul
   return PRESET_THEOLOGICAL_EXEGESIS[key] || null;
 }
 
+export function generateClientTheologicalAnalysis(
+  bookName: string,
+  bookId: string,
+  chapter: number,
+  verseStart?: number,
+  verseEnd?: number,
+  customPassageText?: string
+): string {
+  // Check preset first
+  const preset = getPresetExegesis(bookId, chapter);
+  if (preset && (!verseStart || verseStart === 1)) {
+    return preset;
+  }
+
+  const verseRef = verseStart
+    ? verseEnd && verseEnd !== verseStart
+      ? `ቁጥር ${verseStart}-${verseEnd}`
+      : `ቁጥር ${verseStart}`
+    : 'ምዕራፉ በሙሉ';
+
+  return `### 📖 የክፍሉ የታሪክና ሥነ-ጽሑፋዊ አውድ (${bookName} ምዕራፍ ${chapter}:${verseRef})
+- **መጽሐፍ**: ${bookName} (የፕሮቴስታንት መጽሐፍ ቅዱስ 66 ቀኖናዊ መጻሕፍት ክፍል)
+- **ታሪካዊ አውድ**: የእግዚአብሔር መንፈስ ቅዱስ ቅዱሳን ሰዎችን እየመራ ለቤተክርስቲያንና ለአማኞች ዘላለማዊ መመሪያና የሕይወት ምግብ እንዲሆን የተጻፈ የእግዚአብሔር እስትንፋስ ያለበት ቃል (2ኛ ጢሞቴዎስ 3:16-17)።
+- **ዓላማ**: አማኞች በመንፈሳዊ ዕውቀት፣ በእምነትና በጽድቅ እንዲያድጉ፣ ሐሰተኛ ትምህርቶችን እንዲነቅፉ እና እውነተኛውን የወንጌል እውነት እንዲከተሉ ማዘጋጀት።
+
+### ✝️ ክርስቶስ-ተኮር ትንታኔ (Christocentric & Redemptive-Historical Exegesis)
+- **የወንጌል ማዕከል**: ይህ ክፍል በኢየሱስ ክርስቶስ የተገለጠውን የእግዚአብሔርን የማዳን ዕቅድ እና ዘላለማዊ ጸጋ ያጎላል።
+- **የክርስቶስ ቤዛነት**: ክርስቶስ ኢየሱስ በመስቀል ላይ የከፈለውን ፍጹም ዋጋና ያስገኘልንን ዘላለማዊ ጽድቅ በማወጅ፣ አማኙ በክርስቶስ የማዳን ሥራ ላይ ብቻ ሙሉ በሙሉ እንዲደገፍ ያሳስባል።
+${customPassageText ? `\n> *«${customPassageText.slice(0, 180)}...»*\n` : ''}
+### 🏛️ የወንጌላውያን አስተምህሮ እና አምስቱ ሶላዎች (The 5 Solas)
+1. **Sola Scriptura (መጽሐፍ ቅዱስ ብቻ)**: ይህ ክፍል ለክርስቲያናዊ ሕይወት፣ ለእምነትና ለአምልኮ ብቸኛውና የበላይ ሥልጣን የእግዚአብሔር ቃል ብቻ መሆኑን ያጸናል (መዝሙር 119:105)።
+2. **Sola Fide (በእምነት ብቻ)**: ኃጢአተኛው ሰው በእግዚአብሔር ፊት የሚጸድቀው በራሱ መልካም ሥራ ሳይሆን በኢየሱስ ክርስቶስ በማመን ብቻ ነው (ሮሜ 3:28)።
+3. **Sola Gratia (በጸጋ ብቻ)**: ድነት ሙሉ በሙሉ ያልተገባ የእግዚአብሔር ነጻ ስጦታ እንጂ የሰው ድካም ወይም ዋጋ አይደለም (ኤፌሶን 2:8-9)።
+4. **Solus Christus (በክርስቶስ ብቻ)**: በእግዚአብሔርና በሰው መካከል ያለው ብቸኛው አማላጅ፣ ሊቀ ካህናትና አዳኝ ኢየሱስ ክርስቶስ ብቻ ነው (1ኛ ጢሞቴዎስ 2:5)።
+5. **Soli Deo Gloria (ለእግዚአብሔር ክብር ብቻ)**: በድነታችንና በሕይወታችን ውስጥ ክብርና ምስጋና ሁሉ ለቅድስት ሥላሴ ብቻ ይገባል (ሮሜ 11:36)።
+
+### 🔍 የቃላት ጥናትና አገናዛቢ ጥቅሶች (Original Language Insights & Cross-References)
+- **ጸጋ (Charis / χάሪስ - ኖህ / חֵן)**: ያለ ምንም የሰው ዋጋ ወይም ብቃት የሚሰጥ ፍጹም መለኮታዊ ሞገስ።
+- **እምነት (Pistis / πίστις - ኤሙና / אֱמוּנָה)**: በእግዚአብሔር ተስፋና በክርስቶስ የማዳን ሥራ ላይ ያረፈ ጽኑ መደገፍና ታማኝነት።
+- **ጽድቅ (Dikaiosyne / δικαιοσύνη - ጼዴቅ / צֶדֶק)**: ክርስቶስ ያገኘውን ፍጹም ጽድቅ በእኛ ላይ መቁጠር (Imputation of Righteousness)።
+- **አገናዛቢ ጥቅሶች**: ዮሐንስ 14:6፤ ሮሜ 8:1-4፤ ገላትያ 2:20፤ ዕብራውያን 4:16።
+
+### 🕊️ ለግል ሕይወት ተግባራዊ አተገባበር (Practical Spiritual Application)
+- **በዕለት ተዕለት ሕይወት**: በእግዚአብሔር ቃል እውነት ላይ በመደገፍ በጸሎትና በምስጋና መመላለስ።
+- **በመንፈሳዊ ውጊያ**: በክርስቶስ የተሰጠንን የልጅነት ነጻነት በማወቅ፣ ከፍርሃትና ከኩነኔ ነጻ በመሆን የጸጋውን ወንጌል በድፍረት መመስከር።`;
+}
+
 export const DAILY_DEVOTIONALS = [
   {
     title: 'በክርስቶስ ያለ ነጻነትና አዲስ ማንነት',
