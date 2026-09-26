@@ -9,9 +9,12 @@ import {
   Loader2, 
   HelpCircle,
   RotateCcw,
-  BookOpen
+  BookOpen,
+  Copy,
+  Check
 } from 'lucide-react';
 import { ChatMessage } from '../types';
+import { generateClientTheologyAnswer } from '../data/theologyQnABase';
 
 interface TheologyChatDrawerProps {
   isOpen: boolean;
@@ -38,6 +41,7 @@ export const TheologyChatDrawer: React.FC<TheologyChatDrawerProps> = ({
   ]);
   const [inputQuery, setInputQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Set initial prompt if provided
@@ -52,7 +56,7 @@ export const TheologyChatDrawer: React.FC<TheologyChatDrawerProps> = ({
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen]);
+  }, [messages, isLoading, isOpen]);
 
   // Handle Escape key
   useEffect(() => {
@@ -63,6 +67,23 @@ export const TheologyChatDrawer: React.FC<TheologyChatDrawerProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
+
+  const handleCopyMessage = (id: string, content: string) => {
+    navigator.clipboard.writeText(content);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleResetChat = () => {
+    setMessages([
+      {
+        id: `welcome-${Date.now()}`,
+        role: 'assistant',
+        content: `ውይይቱ በአዲስ መልክ ተጀምሯል። ስለ መጽሐፍ ቅዱስ፣ ሥነ-መለኮት ወይም የወንጌል አስተምህሮ ጥያቄዎን ይጠይቁ።`,
+        timestamp: Date.now(),
+      },
+    ]);
+  };
 
   const handleSendMessage = async (queryToSend?: string) => {
     const text = (queryToSend || inputQuery).trim();
@@ -80,6 +101,10 @@ export const TheologyChatDrawer: React.FC<TheologyChatDrawerProps> = ({
     setIsLoading(true);
 
     try {
+      // 1. Try server endpoint first (with timeout)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
       const response = await fetch('/api/theology/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,34 +112,44 @@ export const TheologyChatDrawer: React.FC<TheologyChatDrawerProps> = ({
           question: text,
           currentContext,
         }),
-      });
+        signal: controller.signal,
+      }).catch(() => null);
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || data.error || 'መልስ ማመንጨት አልተቻለም');
+      clearTimeout(timeoutId);
+
+      if (response && response.ok) {
+        const data = await response.json();
+        if (data && data.answer) {
+          const assistantMsg: ChatMessage = {
+            id: `a-${Date.now()}`,
+            role: 'assistant',
+            content: data.answer,
+            timestamp: Date.now(),
+          };
+          setMessages((prev) => [...prev, assistantMsg]);
+          return;
+        }
       }
 
+      // 2. Fallback seamlessly to client-side theological knowledge engine (Vercel static or offline)
+      const clientAnswer = generateClientTheologyAnswer(text, currentContext);
       const assistantMsg: ChatMessage = {
         id: `a-${Date.now()}`,
         role: 'assistant',
-        content: data.answer || 'ይቅርታ፣ መልስ ማመንጨት አልተቻለም። እባክዎ እንደገና ይሞክሩ።',
+        content: clientAnswer,
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err: any) {
-      let errMsg = err?.message || 'የኔትወርክ ስህተት አጋጥሟል። እባክዎ ጥያቄዎን እንደገና ይሞክሩ።';
-      if (errMsg === 'Failed to fetch' || errMsg.includes('fetch') || errMsg.includes('NetworkError')) {
-        errMsg = 'የኔትወርክ ግንኙነት መቆራረጥ አጋጥሟል። እባክዎ የበይነመረብ ግንኙነትዎን ያረጋግጡና እንደገና ይሞክሩ።';
-      } else if (typeof errMsg === 'string' && (errMsg.includes('503') || errMsg.includes('high demand') || errMsg.includes('UNAVAILABLE'))) {
-        errMsg = 'የቲኦሎጂ ረዳት ሞዴሉ በአሁኑ ወቅት በከፍተኛ የተጠቃሚዎች ጥያቄ ምክንያት ተጨናንቋል። እባክዎ ጥቂት ሰከንዶች ቆይተው እንደገና ይሞክሩ።';
-      }
-      const errorMsg: ChatMessage = {
-        id: `err-${Date.now()}`,
+    } catch {
+      // Guaranteed fallback on any error
+      const clientAnswer = generateClientTheologyAnswer(text, currentContext);
+      const assistantMsg: ChatMessage = {
+        id: `a-${Date.now()}`,
         role: 'assistant',
-        content: `የስህተት መልእክት፦ ${errMsg}`,
+        content: clientAnswer,
         timestamp: Date.now(),
       };
-      setMessages((prev) => [...prev, errorMsg]);
+      setMessages((prev) => [...prev, assistantMsg]);
     } finally {
       setIsLoading(false);
     }
@@ -124,7 +159,9 @@ export const TheologyChatDrawer: React.FC<TheologyChatDrawerProps> = ({
     'በጸጋ ብቻ (Sola Gratia) መዳን ማለት ምን ማለት ነው?',
     'የሮሜ 8:1 ዋና የወንጌል መልእክት ምንድን ነው?',
     'ክርስቶስ ብቸኛው አማላጅ (Solus Christus) መሆኑ በመጽሐፍ ቅዱስ እንዴት ተብራርቷል?',
-    'የሥላሴ አስተምህሮ የመጽሐፍ ቅዱስ ማስረጃዎች ምን ምን ናቸው?',
+    'የቅድስት ሥላሴ አስተምህሮ የመጽሐፍ ቅዱስ ማስረጃዎች ምን ምን ናቸው?',
+    'በእምነት ብቻ መጽደቅ (Sola Fide) እና መልካም ሥራ ልዩነት',
+    'መጽሐፍ ቅዱሳዊ የጾም ትርጉምና ዓላማ ምንድን ነው?'
   ];
 
   if (!isOpen) return null;
@@ -150,12 +187,22 @@ export const TheologyChatDrawer: React.FC<TheologyChatDrawerProps> = ({
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-stone-400 hover:text-stone-100 hover:bg-stone-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleResetChat}
+              className="p-1.5 rounded-lg text-stone-400 hover:text-stone-100 hover:bg-stone-800 transition-colors"
+              title="ውይይቱን አድስ (Reset Chat)"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg text-stone-400 hover:text-stone-100 hover:bg-stone-800 transition-colors"
+              title="ዝጋ"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Current Context Pill if available */}
@@ -180,7 +227,7 @@ export const TheologyChatDrawer: React.FC<TheologyChatDrawerProps> = ({
               )}
 
               <div
-                className={`max-w-[85%] rounded-2xl px-4 py-2.5 leading-relaxed shadow-xs ${
+                className={`max-w-[85%] rounded-2xl px-4 py-2.5 leading-relaxed shadow-xs relative group ${
                   msg.role === 'user'
                     ? 'bg-amber-600 text-white rounded-br-none'
                     : 'bg-stone-800/90 text-stone-200 border border-stone-700/80 rounded-bl-none'
@@ -189,10 +236,31 @@ export const TheologyChatDrawer: React.FC<TheologyChatDrawerProps> = ({
                 {msg.role === 'user' ? (
                   <p>{msg.content}</p>
                 ) : (
-                  <div className="prose prose-invert prose-amber max-w-none text-xs sm:text-sm prose-p:my-1 prose-headings:my-2 prose-ul:my-1">
-                    <div>
+                  <div>
+                    <div className="prose prose-invert prose-amber max-w-none text-xs sm:text-sm prose-p:my-1 prose-headings:my-2 prose-ul:my-1">
                       <Markdown>{msg.content}</Markdown>
                     </div>
+                    {msg.id !== 'welcome' && (
+                      <div className="mt-2 pt-1 border-t border-stone-700/50 flex justify-end">
+                        <button
+                          onClick={() => handleCopyMessage(msg.id, msg.content)}
+                          className="text-[10px] text-stone-400 hover:text-amber-300 flex items-center gap-1 transition-colors"
+                          title="ቅዳ"
+                        >
+                          {copiedId === msg.id ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-400" />
+                              <span className="text-emerald-400">ተቀድቷል</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span>ቅዳ</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
