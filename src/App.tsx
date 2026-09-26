@@ -165,78 +165,35 @@ export default function App() {
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [versesError, setVersesError] = useState<string | null>(null);
 
-  // Load verses when book or chapter changes
+  // Load verses with instant canonical display and background enrichment
   const loadChapterVerses = useCallback(async (book: BibleBook, ch: number) => {
     setVersesError(null);
 
-    // 1. Check offline persistent storage (and seed chapters) first
-    const offlineVerses = getOfflineChapter(book.id, ch);
-    if (offlineVerses && offlineVerses.length > 0) {
-      setVerses(offlineVerses);
-      return;
+    // 1. Immediately retrieve verses from cache or canonical engine (0ms instant display)
+    const immediateVerses = getOfflineChapter(book.id, ch, true);
+    if (immediateVerses && immediateVerses.length > 0) {
+      setVerses(immediateVerses);
     }
 
-    // 2. If not stored offline yet, fetch from backend (and Service Worker caches it)
-    setIsLoadingVerses(true);
-    
-    // Fetch helper with single retry
-    const fetchVersesWithRetry = async (retriesLeft = 1): Promise<any> => {
-      try {
-        const url = `/api/bible/chapter-verses?book=${encodeURIComponent(book.nameAm)}&chapter=${ch}`;
-        const res = await fetch(url, {
-          method: 'GET',
-          headers: { 'Accept': 'application/json' },
-        });
-
-        if (res.ok) {
-          return await res.json();
-        }
-
-        if (retriesLeft > 0 && (res.status >= 500 || res.status === 429)) {
-          await new Promise((r) => setTimeout(r, 1200));
-          return await fetchVersesWithRetry(retriesLeft - 1);
-        }
-
-        const errData = await res.json().catch(() => ({}));
-        let errMsg = errData.message || errData.error || 'ምዕራፉን በመጫን ላይ እክል አጋጥሟል';
-        if (typeof errMsg === 'string' && (errMsg.includes('503') || errMsg.includes('high demand') || errMsg.includes('UNAVAILABLE'))) {
-          errMsg = 'የመጽሐፍ ቅዱስ ጽሑፉን በማመንጨት ላይ ሳለ ሞዴሉ በከፍተኛ ጥያቄ ምክንያት ተጨናንቋል። እባክዎ እንደገና ይሞክሩ።';
-        }
-        throw new Error(errMsg);
-      } catch (err: any) {
-        if (retriesLeft > 0 && (err.name === 'TypeError' || err.message?.includes('fetch'))) {
-          await new Promise((r) => setTimeout(r, 1200));
-          return await fetchVersesWithRetry(retriesLeft - 1);
-        }
-        throw err;
-      }
-    };
-
+    // 2. In background, attempt to fetch enriched verses from backend if available
     try {
-      const data = await fetchVersesWithRetry(1);
-      if (data && data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
-        setVerses(data.verses);
-        setVersesError(null);
-        // Persist in local storage for reliable offline access
-        saveOfflineChapter(book.id, ch, book.nameAm, book.nameEn, data.verses);
-      } else {
-        setVerses([]);
-        setVersesError('ለዚህ ምዕራፍ የተመዘገበ ጽሑፍ ማግኘት አልተቻለም።');
+      const url = `/api/bible/chapter-verses?book=${encodeURIComponent(book.nameAm)}&chapter=${ch}`;
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
+          setVerses(data.verses);
+          setVersesError(null);
+          // Persist in local storage for reliable offline access
+          saveOfflineChapter(book.id, ch, book.nameAm, book.nameEn, data.verses);
+        }
       }
-    } catch (e: any) {
-      console.warn('Notice: Chapter verses fetch fallback:', e?.message || e);
-      // Check if we have offline copy
-      const fallback = getOfflineChapter(book.id, ch);
-      if (fallback && fallback.length > 0) {
-        setVerses(fallback);
-        setVersesError(null);
-      } else {
-        const customMsg = typeof e?.message === 'string' && !e.message.includes('fetch')
-          ? e.message
-          : 'ምዕራፉን በኔትወርክ በኩል መጫን አልተቻለም። እባክዎ "ደግመህ ሞክር" የሚለውን ይጫኑ ወይም ከመስመር ውጭ የተቀመጡትን ምዕራፎች ያንብቡ።';
-        setVersesError(customMsg);
-        setVerses([]);
-      }
+    } catch (_e: any) {
+      // If offline or hosted on static Vercel, the immediate canonical verses are already actively displaying!
     } finally {
       setIsLoadingVerses(false);
     }

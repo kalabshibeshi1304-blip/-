@@ -1,5 +1,6 @@
 import { BibleVerse } from '../types';
 import { SEED_CHAPTERS, getBookById } from '../data/bibleData';
+import { generateCanonicalChapterVerses } from '../data/canonicalBibleEngine';
 
 const OFFLINE_CHAPTERS_KEY = 'kal_offline_chapters_v1';
 const OFFLINE_STATS_KEY = 'kal_offline_stats_v1';
@@ -66,9 +67,9 @@ export function saveOfflineChapter(
 }
 
 /**
- * Retrieves a chapter from offline storage (either curated SEED_CHAPTERS or user-cached chapters)
+ * Retrieves a chapter from offline storage (either curated SEED_CHAPTERS, user-cached chapters, or canonical engine)
  */
-export function getOfflineChapter(bookId: string, chapter: number): BibleVerse[] | null {
+export function getOfflineChapter(bookId: string, chapter: number, generateIfMissing: boolean = true): BibleVerse[] | null {
   const key = `${bookId.toUpperCase()}_${chapter}`;
 
   // 1. Check seed curated canonical chapters first
@@ -80,6 +81,14 @@ export function getOfflineChapter(bookId: string, chapter: number): BibleVerse[]
   const map = getStoredChaptersMap();
   if (map[key] && map[key].verses && map[key].verses.length > 0) {
     return map[key].verses;
+  }
+
+  // 3. If enabled, generate standard canonical chapter verses
+  if (generateIfMissing) {
+    const generated = generateCanonicalChapterVerses(bookId, chapter);
+    if (generated && generated.length > 0) {
+      return generated;
+    }
   }
 
   return null;
