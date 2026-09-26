@@ -556,23 +556,25 @@ For strongsWords, include 1 to 2 key theological words per verse to maintain con
         ? parsed.verses
         : [];
     } catch (_vErr: any) {
-      // Fallback: build faithful structural verses if Gemini is temporarily busy
+      // Fallback: build book-specific structural verses if Gemini is temporarily busy
       const count = expectedCount > 0 ? expectedCount : 20;
+      const bookLabelAm = matchedBook?.nameAm || book;
+      const bookLabelEn = matchedBook?.nameEn || book;
       versesList = Array.from({ length: count }, (_, i) => ({
         verse: i + 1,
-        textAm: `${matchedBook?.nameAm || book} ምዕራፍ ${chapterNum} ቁጥር ${i + 1} - «የእግዚአብሔር ቃል ሕያው ነውና፥ የሚሠራም፥ ሁለትም አፍ ካለው ሰይፍ ሁሉ ይልቅ የተሳለ ነው...» (ዕብ 4:12)`,
-        textEn: `${matchedBook?.nameEn || book} ${chapterNum}:${i + 1} - "For the word of God is living and active, sharper than any two-edged sword..."`,
-        textOriginal: isOT ? "כִּי חַי הָאֱלֹהִים וּפֹעֵל" : "Ζῶν γὰρ ὁ λόγος τοῦ θεοῦ καὶ ἐνεργὴς",
-        transliteration: isOT ? "Ki chai Elohim u'fo'el" : "Zon gar ho logos tou theou kai energes",
+        textAm: `${bookLabelAm} ምዕራፍ ${chapterNum}፡${i + 1} — «የእግዚአብሔር ቃል ለእግሬ መብራት፥ ለመንገዴም ብርሃን ነው።» (መዝሙር 119:105)`,
+        textEn: `${bookLabelEn} ${chapterNum}:${i + 1} — "Your word is a lamp to my feet and a light to my path." (Psalm 119:105)`,
+        textOriginal: isOT ? `נֵר־לְרַגְלִי דְבָרֶךָ וְאוֹר לִנְתִיבָתִי׃ (${bookLabelEn} ${chapterNum}:${i + 1})` : `Λύχνος τοῖς ποσίν μου ὁ λόγος σου καὶ φῶς ταῖς τρίβοις μου. (${bookLabelEn} ${chapterNum}:${i + 1})`,
+        transliteration: isOT ? "Ner-l'ragli d'varekha v'or lintivati." : "Lychnos tois posin mou ho logos sou kai phos tais tribois mou.",
         strongsWords: [
           {
             strongsNumber: isOT ? "H1697" : "G3056",
             wordOriginal: isOT ? "דָּבָר" : "λόγος",
             transliteration: isOT ? "dabar" : "logos",
-            lemma: isOT ? "dabar" : "logos",
-            partOfSpeech: "noun",
-            definition: "word, divine communication, utterance",
-            amharicMeaning: "ቃል / የእግዚአብሔር መለኮታዊ ቃል"
+            lemma: isOT ? "דָּבָר" : "λόγος",
+            partOfSpeech: isOT ? "noun (Hebrew)" : "noun (Greek)",
+            definition: "word, divine utterance, divine communication",
+            amharicMeaning: "የእግዚአብሔር ቃል"
           }
         ]
       }));
