@@ -165,9 +165,14 @@ export default function App() {
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [versesError, setVersesError] = useState<string | null>(null);
 
+  // Ref to track the current active book & chapter to prevent async race conditions
+  const activeChapterRef = React.useRef({ bookId: currentBook.id, chapter: currentChapter });
+  activeChapterRef.current = { bookId: currentBook.id, chapter: currentChapter };
+
   // Load verses with instant canonical display and background enrichment
   const loadChapterVerses = useCallback(async (book: BibleBook, ch: number) => {
     setVersesError(null);
+    activeChapterRef.current = { bookId: book.id, chapter: ch };
 
     // 1. Immediately retrieve verses from cache or canonical engine (0ms instant display)
     const immediateVerses = getOfflineChapter(book.id, ch, true);
@@ -185,7 +190,15 @@ export default function App() {
 
       if (res.ok) {
         const data = await res.json();
-        if (data && data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
+        // Guard against race conditions: only update state if user is still on the same book & chapter
+        if (
+          activeChapterRef.current.bookId === book.id &&
+          activeChapterRef.current.chapter === ch &&
+          data &&
+          data.verses &&
+          Array.isArray(data.verses) &&
+          data.verses.length > 0
+        ) {
           setVerses(data.verses);
           setVersesError(null);
           // Persist in local storage for reliable offline access
@@ -195,7 +208,9 @@ export default function App() {
     } catch (_e: any) {
       // If offline or hosted on static Vercel, the immediate canonical verses are already actively displaying!
     } finally {
-      setIsLoadingVerses(false);
+      if (activeChapterRef.current.bookId === book.id && activeChapterRef.current.chapter === ch) {
+        setIsLoadingVerses(false);
+      }
     }
   }, []);
 
@@ -214,8 +229,11 @@ export default function App() {
 
   // Select a specific book and chapter
   const handleSelectBookAndChapter = (book: BibleBook, chapter: number) => {
+    const validChapter = Math.min(Math.max(1, chapter), book.totalChapters);
     setCurrentBook(book);
-    setCurrentChapter(chapter);
+    setCurrentChapter(validChapter);
+    setActiveView('reader');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Trigger Theological Analysis

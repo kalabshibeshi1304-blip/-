@@ -2,8 +2,8 @@ import { BibleVerse } from '../types';
 import { SEED_CHAPTERS, getBookById } from '../data/bibleData';
 import { generateCanonicalChapterVerses } from '../data/canonicalBibleEngine';
 
-const OFFLINE_CHAPTERS_KEY = 'kal_offline_chapters_v1';
-const OFFLINE_STATS_KEY = 'kal_offline_stats_v1';
+const OFFLINE_CHAPTERS_KEY = 'kal_offline_chapters_v2';
+const OFFLINE_STATS_KEY = 'kal_offline_stats_v2';
 
 export interface StoredChapterData {
   bookId: string;

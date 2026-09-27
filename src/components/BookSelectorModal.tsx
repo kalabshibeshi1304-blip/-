@@ -24,6 +24,13 @@ export const BookSelectorModal: React.FC<BookSelectorModalProps> = ({
   const [activeBookForChapters, setActiveBookForChapters] = useState<BibleBook>(currentBook);
 
   useEffect(() => {
+    if (isOpen) {
+      setActiveBookForChapters(currentBook);
+      setSelectedTestament(currentBook.testament);
+    }
+  }, [isOpen, currentBook]);
+
+  useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
