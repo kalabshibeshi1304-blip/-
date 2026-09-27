@@ -119,7 +119,7 @@ export const AdminSecurityModal: React.FC<AdminSecurityModalProps> = ({
 
   const handleCopyShareMessage = (key: AuthorizedUserKey) => {
     const shareText = `ሰላም ${key.assignedTo}፤
-የቃል (Kal) መጽሐፍ ቅዱስ መተግበሪያ የግል መክፈቻና ማግበሪያ ቁልፍዎ፡
+የሕይወት ብርሃን (Light of Life) መጽሐፍ ቅዱስ መተግበሪያ የግል መክፈቻና ማግበሪያ ቁልፍዎ፡
 
 🔑 የማግበሪያ ቁልፍ (Activation Key)፦ ${key.code}
 

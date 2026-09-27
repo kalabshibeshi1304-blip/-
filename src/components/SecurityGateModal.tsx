@@ -74,7 +74,7 @@ export const SecurityGateModal: React.FC<SecurityGateModalProps> = ({ isOpen, on
             <BookOpen className="w-8 h-8 text-amber-100" />
           </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-amber-100 flex items-center justify-center gap-2">
-            <span>Kal (ቃል) መጽሐፍ ቅዱስ</span>
+            <span>የሕይወት ብርሃን መጽሐፍ ቅዱስ</span>
           </h2>
           <p className="text-xs text-amber-400/90 font-medium mt-1">
             የተፈቀደላቸው ተጠቃሚዎች ማረጋገጫ (Protected Access)

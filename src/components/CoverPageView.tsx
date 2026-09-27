@@ -52,7 +52,7 @@ export const CoverPageView: React.FC<CoverPageViewProps> = ({
         <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-amber-700 via-amber-600 to-amber-500 p-0.5 shadow-xl shadow-amber-600/30 flex items-center justify-center">
           <div className="w-full h-full bg-stone-950/90 rounded-2xl flex flex-col items-center justify-center text-amber-400 gap-1">
             <BookOpen className="w-8 h-8 sm:w-10 sm:h-10 text-amber-300" />
-            <span className="text-[10px] font-mono tracking-widest text-amber-500 font-bold">LOGOS</span>
+            <span className="text-[10px] font-mono tracking-widest text-amber-500 font-bold">LIGHT OF LIFE</span>
           </div>
         </div>
 
@@ -64,11 +64,11 @@ export const CoverPageView: React.FC<CoverPageViewProps> = ({
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-amber-500 font-ethiopic-serif leading-tight">
-            Kal (ቃል) መጽሐፍ ቅዱስ
+            የሕይወት ብርሃን መጽሐፍ ቅዱስ
           </h1>
 
           <h2 className="text-lg sm:text-2xl md:text-3xl font-serif tracking-wider text-amber-200/90 uppercase font-semibold">
-            Kal (The Word) Holy Bible
+            Light of Life Holy Bible
           </h2>
 
           <p className="text-xs sm:text-base text-stone-300 max-w-2xl mx-auto font-ethiopic-sans leading-relaxed pt-1">
@@ -76,21 +76,21 @@ export const CoverPageView: React.FC<CoverPageViewProps> = ({
           </p>
         </div>
 
-        {/* John 1:1 Prologue Callout - Bilingual & Greek */}
+        {/* John 1:1,4 Prologue Callout - Bilingual & Greek */}
         <div className="max-w-3xl mx-auto bg-stone-950/90 border border-amber-500/30 rounded-2xl p-6 sm:p-8 space-y-4 shadow-inner text-left">
           <div className="flex items-center justify-between border-b border-stone-800 pb-2">
             <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
               <Scroll className="w-4 h-4 text-amber-400" />
-              የቃል መሠረት • The Word Prologue (John 1:1)
+              የሕይወት ብርሃን መሠረት • Light of Life Prologue (John 1:1, 4)
             </span>
-            <span className="text-[11px] font-mono text-stone-400">ዮሐንስ 1፥1</span>
+            <span className="text-[11px] font-mono text-stone-400">ዮሐንስ 1፥1, 4</span>
           </div>
 
           {/* Amharic Text */}
           <div className="space-y-1">
             <span className="text-[11px] font-bold text-amber-500 uppercase">አማርኛ (Amharic):</span>
             <blockquote className="text-base sm:text-lg font-ethiopic-serif text-stone-100 italic leading-relaxed pl-3 border-l-2 border-amber-500">
-              «በመጀመሪያ ቃል ነበረ፥ ቃልም በእግዚአብሔር ዘንድ ነበረ፥ ቃልም እግዚአብሔር ነበረ።»
+              «በመጀመሪያ ቃል ነበረ፥ ቃልም በእግዚአብሔር ዘንድ ነበረ፥ ቃልም እግዚአብሔር ነበረ... በእርሱ ሕይወት ነበረች፥ ሕይወትም የሰው ብርሃን ነበረች።»
             </blockquote>
           </div>
 
@@ -98,13 +98,13 @@ export const CoverPageView: React.FC<CoverPageViewProps> = ({
           <div className="space-y-1 pt-1 border-t border-stone-900">
             <span className="text-[11px] font-bold text-amber-500 uppercase">English (WEB / KJV):</span>
             <blockquote className="text-sm sm:text-base font-serif text-stone-200 italic leading-relaxed pl-3 border-l-2 border-amber-600/70">
-              "In the beginning was the Word, and the Word was with God, and the Word was God."
+              "In the beginning was the Word, and the Word was with God, and the Word was God... In Him was life, and the life was the light of men."
             </blockquote>
           </div>
 
           {/* Greek Reference */}
           <div className="text-[12px] font-mono text-stone-400 pt-1 border-t border-stone-900">
-            <span className="text-amber-500 font-bold">Greek (Original):</span> «Ἐν ἀρχῇ ἦν ὁ Λόγος, καὶ ὁ Λόγος ἦν πρὸς τὸν Θεόν, καὶ Θεὸς ἦν ὁ Λόγος.»
+            <span className="text-amber-500 font-bold">Greek (Original):</span> «Ἐν αὐτῷ ζωὴ ἦν, καὶ ἡ ζωὴ ἦν τὸ φῶς τῶν ἀνθρώπων.» (John 1:4)
           </div>
         </div>
 

@@ -69,10 +69,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div className="hidden sm:block">
               <h1 className="text-sm sm:text-base font-bold tracking-tight text-stone-100 leading-tight flex items-center gap-1.5">
-                <span>Kal (ቃል) መጽሐፍ ቅዱስ</span>
+                <span>የሕይወት ብርሃን መጽሐፍ ቅዱስ</span>
               </h1>
               <p className="text-[10px] text-amber-400 font-medium">
-                Kal Holy Bible • የወንጌላዊ ቲኦሎጂ ጥናት
+                Light of Life Holy Bible • የወንጌላዊ ቲኦሎጂ ጥናት
               </p>
             </div>
           </div>
@@ -210,7 +210,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <BookOpen className="w-4 h-4 text-amber-400" />
-            <span>ከቨር ፔጅ (Cover)</span>
+            <span>የሕይወት ብርሃን (Home)</span>
           </button>
 
           <button

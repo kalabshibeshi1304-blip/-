@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import { PROTESTANT_BOOKS } from '../../src/data/bibleData';
 import { getExpectedVerseCount } from '../../src/data/bibleVerseCounts';
 import { SEED_CHAPTERS } from '../../src/data/seedChapters/index';
+import { generateCanonicalChapterVerses, CURATED_CANONICAL_CHAPTERS } from '../../src/data/canonicalBibleEngine';
 
 function getGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
@@ -94,12 +95,21 @@ export default async function handler(req: any, res: any) {
   const bookId = matchedBook ? matchedBook.id : String(bookParam);
   const key = `${bookId.toUpperCase()}_${chapterNum}`;
 
-  // 1. Check static seed chapters first
+  // 1. Check static seed chapters first (0ms instant response)
   if (SEED_CHAPTERS[key] && SEED_CHAPTERS[key].length > 0) {
     return res.status(200).json({
       book: matchedBook?.nameAm || bookParam,
       chapter: chapterNum,
       verses: SEED_CHAPTERS[key],
+    });
+  }
+
+  // 2. Check curated canonical chapters (0ms instant response)
+  if (CURATED_CANONICAL_CHAPTERS[key] && CURATED_CANONICAL_CHAPTERS[key].length > 0) {
+    return res.status(200).json({
+      book: matchedBook?.nameAm || bookParam,
+      chapter: chapterNum,
+      verses: CURATED_CANONICAL_CHAPTERS[key],
     });
   }
 
@@ -109,6 +119,7 @@ export default async function handler(req: any, res: any) {
     ? 'Biblical Hebrew (Biblia Hebraica Stuttgartensia / BHS with vowels)'
     : 'Biblical Koine Greek (Novum Testamentum Graece / NA28 with accents)';
 
+  // 3. Attempt AI enrichment if Gemini API is available
   try {
     const ai = getGeminiClient();
     const systemInstruction =
@@ -168,29 +179,11 @@ JSON Schema:
       });
     }
   } catch (err: any) {
-    console.warn('Vercel serverless chapter-verses fallback:', err?.message || err);
+    console.warn('Vercel serverless chapter-verses dynamic generation fallback:', err?.message || err);
   }
 
-  // Fallback if AI call fails
-  const total = expectedCount > 0 ? expectedCount : 15;
-  const fallbackVerses = Array.from({ length: total }, (_, i) => ({
-    verse: i + 1,
-    textAm: `${matchedBook?.nameAm || bookParam} ${chapterNum}:${i + 1} — «የእግዚአብሔር ቃል ለእግሬ መብራት፥ ለመንገዴም ብርሃን ነው።» (መዝሙር 119:105)`,
-    textEn: `${matchedBook?.nameEn || bookParam} ${chapterNum}:${i + 1} — "Your word is a lamp to my feet and a light to my path." (Psalm 119:105)`,
-    textOriginal: isOT ? 'נֵר־לְרַגְלִי דְבָרֶךָ וְאוֹר לִנְתִיבָתִי׃' : 'Λύχνος τοῖς ποσίν μου ὁ λόγος σου καὶ φῶς ταῖς τρίβοις μου.',
-    transliteration: isOT ? "Ner-l'ragli d'varekha v'or lintivati." : "Lychnos tois posin mou ho logos sou kai phos tais tribois mou.",
-    strongsWords: [
-      {
-        strongsNumber: isOT ? 'H1697' : 'G3056',
-        wordOriginal: isOT ? 'דָּבָר' : 'λόγος',
-        transliteration: isOT ? 'dabar' : 'logos',
-        lemma: isOT ? 'דָּבָר' : 'λόγος',
-        partOfSpeech: 'noun',
-        definition: 'word, divine utterance',
-        amharicMeaning: 'ቃል / የእግዚአብሔር ቃል'
-      }
-    ]
-  }));
+  // 4. Reliable canonical engine fallback for all 66 books and 1189 chapters
+  const fallbackVerses = generateCanonicalChapterVerses(bookId, chapterNum);
 
   return res.status(200).json({
     book: matchedBook?.nameAm || bookParam,

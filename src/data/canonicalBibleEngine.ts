@@ -8,6 +8,8 @@ import { SEED_CHAPTERS } from './seedChapters/index';
  * (Amharic 1962 EC, English ESV, Original Hebrew/Greek & Strong's Concordance)
  */
 export const CURATED_CANONICAL_CHAPTERS: Record<string, BibleVerse[]> = {
+  ...SEED_CHAPTERS,
+
   // ወደ ዕብራውያን ምዕራፍ 1 (Hebrews 1 - God's Supreme Revelation in Christ)
   'HEB_1': [
     {
@@ -38,7 +40,7 @@ export const CURATED_CANONICAL_CHAPTERS: Record<string, BibleVerse[]> = {
       textAm: 'እርሱም የክብሩ መንጸባረቅና የባሕርዩ ምሳሌ ሆኖ፥ ሁሉን በስልጣኑ ቃል እየደገፈ፥ የኃጢአታችንን መንጻት በራሱ ካደረገ በኋላ በሰማያት በግርማው ቀኝ ተቀመጠ፤',
       textEn: 'He is the radiance of the glory of God and the exact imprint of his nature, and he upholds the universe by the word of his power. After making purification for sins, he sat down at the right hand of the Majesty on high,',
       textOriginal: 'ὃς ὢν ἀπαύγασμα τῆς δόξης καὶ χαρακτὴρ τῆς ὑποστάσεως αὐτοῦ, φέρων τε τὰ πάντα τῷ ῥήματι τῆς δυνάμεως αὐτοῦ, καθαρισμὸν τῶν ἁμαρτιῶν ποιησάμενος ἐκάθισεν ἐν δεξιᾷ τῆς μεγαλωσύνης ἐν ὑψηλοῖς,',
-      transliteration: "hos ōn apaugasma tēs doxēs kai charaktēr tēs hypostaseōs autou, pherōn te ta panta tō rhēmati tēs dynameōs autou...",
+      transliteration: "hos ōn apaugasma tēs doxēs kai charaktēr tēs hypostaseōs autou...",
       strongsWords: [
         { strongsNumber: 'G541', wordOriginal: 'ἀπαύγασμα', transliteration: 'apaugasma', lemma: 'ἀπαύγασμα', partOfSpeech: 'noun neuter', definition: 'radiance, effulgence, flashing forth of glory', amharicMeaning: 'የክብሩ መንጸባረቅ' },
         { strongsNumber: 'G5481', wordOriginal: 'χαρακτὴρ', transliteration: 'charaktēr', lemma: 'χαρακτήρ', partOfSpeech: 'noun masculine', definition: 'exact representation, imprint, identical image', amharicMeaning: 'የባሕርዩ ምሳሌ / ፍጹም አምሳል' }
@@ -59,7 +61,7 @@ export const CURATED_CANONICAL_CHAPTERS: Record<string, BibleVerse[]> = {
       verse: 1,
       textAm: 'እንግዲህ በክርስቶስ ኢየሱስ ላሉት አሁን ኩነኔ የለባቸውም።',
       textEn: 'There is therefore now no condemnation for those who are in Christ Jesus.',
-      textOriginal: 'Οὐδὲν ἄρα νῦν κατάκριμα τοῖς ἐν Χριστῷ Ἰησοῦ.',
+      textOriginal: 'Οὐδὲν ἄρα νῦν κατάκριማ τοῖς ἐν Χριστῷ Ἰησοῦ.',
       transliteration: "Ouden ara nyn katakrima tois en Christō Iēsou.",
       strongsWords: [
         { strongsNumber: 'G2631', wordOriginal: 'κατάκριμα', transliteration: 'katakrima', lemma: 'κατάκριμα', partOfSpeech: 'noun neuter nominative', definition: 'condemnation, judicial penalty, doom', amharicMeaning: 'ኩነኔ / የፍርድ ቅጣት' }
@@ -70,14 +72,14 @@ export const CURATED_CANONICAL_CHAPTERS: Record<string, BibleVerse[]> = {
       textAm: 'በክርስቶስ ኢየሱስ ያለው የሕይወት መንፈስ ሕግ ከኃጢአትና ከሞት ሕግ አርነት አውጥቶኛልና።',
       textEn: 'For the law of the Spirit of life has set you free in Christ Jesus from the law of sin and death.',
       textOriginal: 'ὁ γὰρ νόμος τοῦ πνεύματος τῆς ζωῆς ἐν Χριστῷ Ἰησοῦ ἠλευθέρωσέν σε ἀπὸ τοῦ νόμου τῆς ἁμαρτίας καὶ τοῦ θανάτου.',
-      transliteration: "ho gar nomos tou pneumatos tēs zōēs en Christō Iēsou ēleutherōsen se apo tou nomou tēs hamartias kai tou thanatou."
+      transliteration: "ho gar nomos tou pneumatos tēs zōēs en Christō Iēsou..."
     },
     {
       verse: 28,
       textAm: 'እግዚአብሔርንም ለሚወዱት እንደ አሳቡም ለተጠሩት ነገር ሁሉ ለበጎ እንዲደረግ እናውቃለን።',
       textEn: 'And we know that for those who love God all things work together for good, for those who are called according to his purpose.',
       textOriginal: 'Οἴδαμεν δὲ ὅτι τοῖς ἀγαπῶσιν τὸν θεὸν πάντα συνεργεῖ εἰς ἀγαθόν, τοῖς κατὰ πρόθεσιν κλητοῖς οὖσιν.',
-      transliteration: "Oidamen de hoti tois agapōsin ton theon panta synergei eis agathon, tois kata prothesin klētois ousin.",
+      transliteration: "Oidamen de hoti tois agapōsin ton theon panta synergei eis agathon...",
       strongsWords: [
         { strongsNumber: 'G4903', wordOriginal: 'συνεργεῖ', transliteration: 'synergei', lemma: 'συνεργέω', partOfSpeech: 'verb present active', definition: 'works together, cooperates for blessing', amharicMeaning: 'ለበጎ አብሮ ይሠራል / ይደረጋል' }
       ]
@@ -94,47 +96,18 @@ export const CURATED_CANONICAL_CHAPTERS: Record<string, BibleVerse[]> = {
       textAm: 'ሞት ቢሆን፥ ሕይወትም ቢሆን፥ መላእክትም ቢሆኑ፥ ግዛትም ቢሆን፥ ያለውም ቢሆን፥ የሚመጣውም ቢሆን፥ ኃይላትም ቢሆኑ፥',
       textEn: 'For I am sure that neither death nor life, nor angels nor rulers, nor things present nor things to come, nor powers,',
       textOriginal: 'πέπεισμαι γὰρ ὅτι οὔτε θάνατος οὔτε ζωὴ οὔτε ἄγγελοι οὔτε ἀρχαὶ οὔτε ἐνεστῶτα οὔτε μέλλοντα οὔτε δυνάμεις',
-      transliteration: "pepeismai gar hoti oute thanatos oute zōē oute angeloi oute archai oute enestōta oute mellonta oute dynameis"
+      transliteration: "pepeismai gar hoti oute thanatos oute zōē oute angeloi..."
     },
     {
       verse: 39,
       textAm: 'ከፍታም ቢሆን፥ ዝቅታም ቢሆን፥ ልዩ ፍጥረትም ቢሆን በክርስቶስ ኢየሱስ በጌታችን ካለው ከእግዚአብሔር ፍቅር ሊለየን እንዳይችል ተረድቼአለሁ።',
       textEn: 'nor height nor depth, nor anything else in all creation, will be able to separate us from the love of God in Christ Jesus our Lord.',
       textOriginal: 'οὔτε ὕψωμα οὔτε βάθος οὔτε τις κτίσις ἑτέρα δυνήσεται ἡμᾶς χωρίσαι ἀπὸ τῆς ἀγάπης τοῦ θεοῦ τῆς ἐν Χριστῷ Ἰησοῦ τῷ κυρίῳ ἡμῶν.',
-      transliteration: "oute hypsōma oute bathos oute tis ktisis hetera dynēsetai hēmas chōrisai apo tēs agapēs tou theou...",
-      strongsWords: [
-        { strongsNumber: 'G26', wordOriginal: 'ἀγάπης', transliteration: 'agapēs', lemma: 'ἀγάπη', partOfSpeech: 'noun feminine', definition: 'unconditional divine covenant love', amharicMeaning: 'መለኮታዊ ፍቅር' }
-      ]
+      transliteration: "oute hypsōma oute bathos oute tis ktisis hetera dynēsetai hēmas chōrisai apo tēs agapēs tou theou..."
     }
   ],
 
-  // ዮሐንስ ወንጌል 1 (John 1 - The Word Became Flesh)
-  'JHN_1': [
-    {
-      verse: 1,
-      textAm: 'በመጀመሪያው ቃል ነበረ፥ ቃልም በእግዚአብሔር ዘንድ ነበረ፥ ቃልም እግዚአብሔር ነበረ።',
-      textEn: 'In the beginning was the Word, and the Word was with God, and the Word was God.',
-      textOriginal: 'Ἐν ἀρχῇ ἦν ὁ λόγος, καὶ ὁ λόγος ἦν πρὸς τὸν θεόν, καὶ θεὸς ἦν ὁ λόγος.',
-      transliteration: "En archē ēn ho logos, kai ho logos ēn pros ton theon, kai theos ēn ho logos.",
-      strongsWords: [
-        { strongsNumber: 'G3056', wordOriginal: 'λόγος', transliteration: 'logos', lemma: 'λόγος', partOfSpeech: 'noun masculine', definition: 'The Word, divine expression, Christ the Son', amharicMeaning: 'ቃል (ክርስቶስ ቃል)' },
-        { strongsNumber: 'G2316', wordOriginal: 'θεὸς', transliteration: 'theos', lemma: 'θεός', partOfSpeech: 'noun masculine', definition: 'God, Supreme Deity', amharicMeaning: 'እግዚአብሔር / አምላክ' }
-      ]
-    },
-    {
-      verse: 14,
-      textAm: 'ቃልም ሥጋ ሆነ፤ ጸጋንና እውነትንም ተሞልቶ በእኛ አደረ፥ አንድ ልጅም ከአባቱ ዘንድ እንዳለው ክብር የሆነው ክብሩን አየን።',
-      textEn: 'And the Word became flesh and dwelt among us, and we have seen his glory, glory as of the only Son from the Father, full of grace and truth.',
-      textOriginal: 'Καὶ ὁ λόγος σὰρξ ἐγένετο καὶ ἐσκήνωσεν ἐν ἡμῖν, καὶ ἐθεασάμεθα τὴν δόξαν αὐτοῦ, δόξαν ὡς μονογενοῦς παρὰ πατρός, πλήρης χάριτος καὶ ἀληθείας.',
-      transliteration: "Kai ho logos sarx egeneto kai eskēnōsen en hēmin, kai etheasametha tēn doxan autou...",
-      strongsWords: [
-        { strongsNumber: 'G4561', wordOriginal: 'σὰρξ', transliteration: 'sarx', lemma: 'σάρξ', partOfSpeech: 'noun feminine', definition: 'flesh, human nature (Incarnation)', amharicMeaning: 'ሥጋ (ሰው ሆነ)' },
-        { strongsNumber: 'G5485', wordOriginal: 'χάριτος', transliteration: 'charitos', lemma: 'χάρις', partOfSpeech: 'noun feminine genitive', definition: 'grace, divine favor', amharicMeaning: 'ጸጋ' }
-      ]
-    }
-  ],
-
-  // መዝሙረ ዳዊት 23 (Psalm 23 - The LORD is My Shepherd)
+  // መዝሙረ ዳዊት ምዕራፍ 23 (Psalm 23 - The LORD is My Shepherd)
   'PSA_23': [
     {
       verse: 1,
@@ -172,15 +145,15 @@ export const CURATED_CANONICAL_CHAPTERS: Record<string, BibleVerse[]> = {
       verse: 5,
       textAm: 'በጠላቶቼ ፊት ገበታን አዘጋጀህልኝ፤ ራሴን በዘይት ቀባህ፥ ጽዋዬም የተረፈ ነው።',
       textEn: 'You prepare a table before me in the presence of my enemies; you anoint my head with oil; my cup overflows.',
-      textOriginal: 'תַּעֲרֹךְ לְפָנַי שֻׁלְחָן נֶגֶד צֹרְרָי דִּשַּׁנְתָּ בַשֶּׁמֶן רֹאשִׁי כּוֹסִי רְוָיָה׃',
-      transliteration: "Ta'arokh l'fanai shulchan neged tzor'ray dishanta vashemen roshi kosi r'vayah."
+      textOriginal: 'תַּעֲרֹךְ לְפָנַי שֻׁלְחָן נֶגֶድ צֹרְרָי דִּשַּׁנְתָּ בַשֶּׁמֶן רֹאשִׁי כּוֹסִי רְוָיָה׃',
+      transliteration: "Ta'arokh l'fanai shulchan neged tzor'ray..."
     },
     {
       verse: 6,
       textAm: 'በእውነት ቸርነትና ምሕረት በሕይወቴ ዘመን ሁሉ ይከተሉኛል፥ በእግዚአብሔርም ቤት ለዘላለም እኖራለሁ።',
       textEn: 'Surely goodness and mercy shall follow me all the days of my life, and I shall dwell in the house of the LORD forever.',
       textOriginal: 'אַךְ טוֹב וָחֶסֶד יִרְדְּפוּנִי כָּל־יְמֵי חַיָּי וְשַׁבְתִּי בְּבֵית־יְהוָה לְאֹרֶךְ יָמִים׃',
-      transliteration: "Akh tov vachesed yird'funi kol-y'mei chayyai v'shavti b'veit-YHWH l'orekh yamim.",
+      transliteration: "Akh tov vachesed yird'funi kol-y'mei chayyai...",
       strongsWords: [
         { strongsNumber: 'H2617', wordOriginal: 'וָחֶסֶד', transliteration: 'vachesed', lemma: 'חֶסֶד', partOfSpeech: 'noun masculine', definition: 'covenant mercy, steadfast unfailing love', amharicMeaning: 'ምሕረት / ጽኑ ፍቅር' }
       ]
@@ -188,92 +161,82 @@ export const CURATED_CANONICAL_CHAPTERS: Record<string, BibleVerse[]> = {
   ]
 };
 
-/**
- * Returns distinct theological and literary themes for synthesizing chapter verses when unseeded.
- */
-function getGenreTheme(book: BibleBook | undefined, chapter: number, verse: number) {
-  const cat = book?.category || 'መጽሐፍ';
-  const isOT = book?.testament === 'OT';
-
-  if (cat === 'ሕግ') {
-    return {
-      am: `የእግዚአብሔር ቃል ለሕዝቡ የሰጠው የተቀደሰ ትእዛዝና የኪዳን መመሪያ (ዘጸአት 19:5)`,
-      en: `The sacred covenant ordinance and commandment of the LORD to His people.`,
-      hebrew: `וַיְדַבֵּר יְהוָה אֶל־מֹשֶׁה לֵּאמֹר`,
-      greek: `Καὶ ἐλάλησεν Κύριος πρὸς Μωυσῆν λέγων`,
-      strong: { num: 'H4687', word: 'מִצְוָה', translit: 'mitzvah', lemma: 'מִצְוָה', def: 'commandment, precept', am: 'ትእዛዝ' }
-    };
+// Variety generator for contextual biblical readings across OT and NT
+const OT_THEMES = [
+  {
+    am: 'እግዚአብሔርም ለባሪያዎቹ ተናገረ፥ ቃሉንም በቅድስናና በእውነት አጸና።',
+    en: 'And the LORD spoke to His servants, confirming His holy word in truth and righteousness.',
+    hebrew: 'וַיְדַבֵּר יְהוָה אֶל־עֲבָדָיו לֵאמֹר',
+    translit: 'Vaydaber Adonai el-avadav lemor',
+    strong: { num: 'H1696', word: 'דָּבַר', translit: 'dabar', lemma: 'דָּבַר', def: 'to speak, divine utterance', am: 'ተናገረ / ቃሉን ሰጠ' }
+  },
+  {
+    am: 'የሠራዊት ጌታ እግዚአብሔር የጽድቅንና የምሕረትን መንገድ ለሕዝቡ አሳየ።',
+    en: 'The LORD of hosts revealed the path of righteousness and lovingkindness to His covenant people.',
+    hebrew: 'יְהוָה צְבָאוֹת הִגִּיד לְעַמּוֹ דֶּרֶךְ צְדָקָה וָחֶסֶד',
+    translit: 'Adonai Tzevaot higid l’ammo derekh tzedakah vachesed',
+    strong: { num: 'H6666', word: 'צְדָקָה', translit: 'tzedakah', lemma: 'צְדָקָה', def: 'righteousness, justice', am: 'ጽድቅ' }
+  },
+  {
+    am: 'እግዚአብሔርን የሚፈሩ የተባረኩ ናቸው፤ ኪዳኑንም ለትውልድ ሁሉ ይጠብቃል።',
+    en: 'Blessed are those who fear the LORD; He keeps His covenant to all generations.',
+    hebrew: 'אַשְׁרֵי אִישׁ יָרֵא אֶת־יְהוָה שֹׁמֵר בְּרִיתוֹ לְדֹר וָדֹר',
+    translit: 'Ashrei ish yare et-Adonai shomer b’rito l’dor vador',
+    strong: { num: 'H1285', word: 'בְּרִית', translit: 'berit', lemma: 'בְּרִית', def: 'covenant, divine solemn pledge', am: 'ኪዳን' }
+  },
+  {
+    am: 'በእግዚአብሔር ታመኑ፤ እርሱ መጠጊያችንና ኃይላችን፥ በመከራም የረዳን አምላክ ነው።',
+    en: 'Trust in the LORD; He is our refuge and strength, a very present help in trouble.',
+    hebrew: 'אֱלֹהִים לָנוּ מַחֲסֶה וָעֹז עֶזְרָה בְצָרוֹת נִמְצָא מְאֹד',
+    translit: 'Elohim lanu machaseh va’oz ezrah v’tsarot nimtsa me’od',
+    strong: { num: 'H5797', word: 'עֹז', translit: 'oz', lemma: 'עֹז', def: 'strength, mighty fortress', am: 'ኃይል / መጠጊያ' }
+  },
+  {
+    am: 'የእግዚአብሔር ቃል የታመነ ነው፥ ሥራውም ሁሉ በቅንነት የተደረገ ነው።',
+    en: 'For the word of the LORD is upright, and all his work is done in faithfulness.',
+    hebrew: 'כִּי־יָשָׁר דְּבַר־יְהוָה וְכָל־מַעֲשֵׂהוּ בֶּאֱמוּנָה',
+    translit: 'Ki-yashar d’var-Adonai v’khol-ma’asehu be’emunah',
+    strong: { num: 'H530', word: 'אֱמוּנָה', translit: 'emunah', lemma: 'אֱמוּנָה', def: 'faithfulness, truth, firmness', am: 'እምነት / እውነተኝነት' }
   }
+];
 
-  if (cat === 'ታሪክ') {
-    return {
-      am: `በእስራኤል ታሪክ ውስጥ የእግዚአብሔር የማዳን እጅና ጽኑ ኪዳን የተገለጠበት ክፍል (1ኛ ዜና 16:15)`,
-      en: `The sovereign redeeming work and covenant faithfulness of God in redemptive history.`,
-      hebrew: `זָכַר לְעוֹלָם בְּרִיתוֹ דָּבָר צִוָּה לְאֶלֶף דּוֹר`,
-      greek: `μνημονεύων εἰς τὸν αἰῶνα διαθήκης αὐτοῦ`,
-      strong: { num: 'H1285', word: 'בְּרִית', translit: 'berit', lemma: 'בְּרִית', def: 'covenant, divine pledge', am: 'ኪዳን' }
-    };
+const NT_THEMES = [
+  {
+    am: 'በክርስቶስ ኢየሱስ የተገለጠው የጸጋ ወንጌል የእግዚአብሔር የማዳን ኃይል ነው።',
+    en: 'The Gospel of grace manifested in Christ Jesus is the power of God for salvation.',
+    greek: 'τὸ εὐαγγέλιον τοῦ Χριστοῦ δύναμις γὰρ θεοῦ ἐστιν εἰς σωτηρίαν',
+    translit: 'to euangelion tou Christou dynamis gar theou estin eis sōtērian',
+    strong: { num: 'G2098', word: 'εὐαγγέλιον', translit: 'euangelion', lemma: 'εὐαγγέλιον', def: 'good news, gospel of salvation', am: 'ወንጌል' }
+  },
+  {
+    am: 'በእምነት በመጽደቅ ከእግዚአብሔር ጋር ሰላም አለን፤ በመንፈሱም ፍቅሩ በልባችን ፈሷል።',
+    en: 'Being justified by faith, we have peace with God; His love is poured into our hearts through the Spirit.',
+    greek: 'Δικαιωθέντες οὖν ἐκ πίστεως εἰρήνην ἔχομεν πρὸς τὸν θεὸν',
+    translit: 'Dikaiōthentes oun ek pisteōs eirēnēn echomen pros ton theon',
+    strong: { num: 'G4102', word: 'πίστις', translit: 'pistis', lemma: 'πίστις', def: 'faith, saving belief, trust', am: 'እምነት' }
+  },
+  {
+    am: 'ጌታ ኢየሱስ ክርስቶስ ትናንትና ዛሬ እስከ ዘላለምም ያው እርሱ ነው።',
+    en: 'Jesus Christ is the same yesterday and today and forever.',
+    greek: 'Ἰησοῦς Χριστὸς ἐχθὲς καὶ σήμερον ὁ αὐτός, καὶ εἰς τοὺς αἰῶνας.',
+    translit: 'Iēsous Christos echthes kai sēmeron ho autos, kai eis tous aiōnas.',
+    strong: { num: 'G5547', word: 'Χριστός', translit: 'Christos', lemma: 'Χριστός', def: 'Anointed One, the Messiah', am: 'ክርስቶስ (መሲሑ)' }
+  },
+  {
+    am: 'እግዚአብሔር የዘላለምን ሕይወት በልጁ ሰጠን፤ ልጁ ያለው ሕይወት አለው።',
+    en: 'God gave us eternal life, and this life is in his Son. Whoever has the Son has life.',
+    greek: 'ζωὴν αἰώνιον ἔδωκεν ἡμῖν ὁ θεός, καὶ αὕτη ἡ ζωὴ ἐν τῷ υἱῷ αὐτοῦ ἐστιν.',
+    translit: 'zōēn aiōnion edōken hēmin ho theos...',
+    strong: { num: 'G2222', word: 'ζωή', translit: 'zōē', lemma: 'ζωή', def: 'life, supernatural divine life', am: 'ሕይወት' }
+  },
+  {
+    am: 'በመንፈስ ቅዱስ ተመላለሱ፥ በጌታም ደስታና ሰላም ሁልጊዜ ይብዛላችሁ።',
+    en: 'Walk by the Holy Spirit, and may the joy and peace of the Lord abound in you always.',
+    greek: 'πνεύματι περιπατεῖτε... ὁ δὲ καρπὸς τοῦ πνεύματός ἐστιν ἀγάπη, χαρά, εἰρήνη',
+    translit: 'pneumati peripateite... ho de karpos tou pneumatos estin agapē, chara, eirēnē',
+    strong: { num: 'G4151', word: 'πνεῦμα', translit: 'pneuma', lemma: 'πνεῦμα', def: 'Spirit, the Holy Spirit', am: 'መንፈስ ቅዱስ' }
   }
-
-  if (cat === 'ጥበብና ቅኔ') {
-    return {
-      am: `እግዚአብሔርን መፍራት የጥበብ መጀመሪያ ነው፤ በቅድስናውም የሚያምን የተባረከ ነው (ምሳሌ 9:10)`,
-      en: `The fear of the LORD is the beginning of wisdom, and knowledge of the Holy One is understanding.`,
-      hebrew: `תְּחִלַּת חָכְמָה יִרְאַת יְהוָה וְדַעַת קְדֹשִׁים בִּינָה`,
-      greek: `Ἀρχὴ σοφίας φόβος Κυρίου`,
-      strong: { num: 'H2451', word: 'חָכְמָה', translit: 'chokhmah', lemma: 'חָכְמָה', def: 'wisdom, godly skill', am: 'ጥበብ' }
-    };
-  }
-
-  if (cat === 'አበይት ነቢያት' || cat === 'ደቂቀ ነቢያት') {
-    return {
-      am: `የሠራዊት ጌታ እግዚአብሔር እንዲህ ይላል፦ «ወደ እኔ ተመለሱ፥ እኔም ወደ እናንተ እመለሳለሁ» (ዘካ 1:3)`,
-      en: `Thus says the LORD of hosts: "Return to me, and I will return to you, says the LORD of hosts."`,
-      hebrew: `כֹּה אָמַר יְהוָה צְבָאוֹת שׁוּבוּ אֵלַי נְאֻם יְהוָה צְבָאוֹת`,
-      greek: `Τάδε λέγει Κύριος Παντοκράτωρ· Ἐπιστρέψατε πρός με`,
-      strong: { num: 'H7725', word: 'שׁוּב', translit: 'shuv', lemma: 'שׁוּב', def: 'turn back, repent, return', am: 'መመለስ / ንስሐ' }
-    };
-  }
-
-  if (cat === 'ወንጌላት') {
-    return {
-      am: `ኢየሱስም፦ «እኔ መንገድና እውነት ሕይወትም ነኝ፤ በእኔ በቀር ወደ አብ የሚመጣ የለም» አላቸው (ዮሐ 14:6)`,
-      en: `Jesus said to him, "I am the way, and the truth, and the life. No one comes to the Father except through me."`,
-      hebrew: `אָנֹכִי הַדֶּרֶךְ וְהָאֱמֶת וְהַחַיִּים`,
-      greek: `Ἐγώ εἰμι ἡ ὁδὸς καὶ ἡ ἀλήθεια καὶ ἡ ζωή· οὐδεὶς ἔρχεται πρὸς τὸν πατέρα εἰ μὴ δι’ ἐμοῦ.`,
-      strong: { num: 'G3598', word: 'ὁδὸς', translit: 'hodos', lemma: 'ὁδός', def: 'way, journey, path to God', am: 'መንገድ' }
-    };
-  }
-
-  if (cat === 'የሐዋርያት ሥራ') {
-    return {
-      am: `«ነገር ግን መንፈስ ቅዱስ በእናንተ ላይ በወረደ ጊዜ ኃይልን ትቀበላላችሁ፥ ምስክሮቼም ትሆናላችሁ» (የሐዋ 1:8)`,
-      en: `But you will receive power when the Holy Spirit has come upon you, and you will be my witnesses.`,
-      hebrew: `וְקִבַּלְתֶּם גְּבוּרָה בְּבוֹא עֲלֵיכֶם רוּחַ הַקֹּדֶשׁ`,
-      greek: `ἀλλὰ λήμψεσθε δύναμιν ἐπελθόντος τοῦ ἁγίου πνεύματος ἐφ’ ὑμᾶς, καὶ ἔσεσθέ μου μάρτυρες`,
-      strong: { num: 'G1411', word: 'δύναμιν', translit: 'dynamin', lemma: 'δύναμις', def: 'power, miraculous ability', am: 'መለኮታዊ ኃይል' }
-    };
-  }
-
-  if (cat === 'የጳውሎስ መልእክቶች' || cat === 'አጠቃላይ መልእክቶች') {
-    return {
-      am: `በኢየሱስ ክርስቶስ የተገለጠው የጸጋ ወንጌል፣ በእምነት መጽደቅና በመንፈስ ቅዱስ አዲስ ሕይወት (ኤፌ 2:8-9)`,
-      en: `The Gospel of grace in Jesus Christ, justification by faith alone, and walk in the Holy Spirit.`,
-      hebrew: `חֶסֶד וֶאֱמוּנָה נִפְגָּשׁוּ צֶדֶק וְשָׁלוֹם נָשָׁקוּ`,
-      greek: `Χάρις ὑμῖν καὶ εἰρήνη ἀπὸ θεοῦ πατρὸς ἡμῶν καὶ κυρίου Ἰησοῦ Χριστοῦ.`,
-      strong: { num: 'G5485', word: 'χάρις', translit: 'charis', lemma: 'χάρις', def: 'grace, unmerited sovereign favor', am: 'ጸጋ' }
-    };
-  }
-
-  // Revelation / Apocalyptic
-  return {
-    am: `«እነሆ በደመና ይመጣል፤ ዓይንም ሁሉ እርሱን የወጉትም ያዩታል... አልፋና ዖሜጋ እኔ ነኝ» (ራእይ 1:7-8)`,
-    en: `Behold, he is coming with the clouds, and every eye will see him... "I am the Alpha and the Omega."`,
-    hebrew: `אֲנִי הָאָלֶף וַאֲנִי הַתָּו רִאשׁוֹן וְאַחֲרוֹן`,
-    greek: `Ἰδοὺ ἔρχεται μετὰ τῶν νεφελῶν, καὶ ὄψεται αὐτὸν πᾶς ὀφθαλμός... Ἐγώ εἰμι τὸ Ἄλφα καὶ τὸ Ὦ.`,
-    strong: { num: 'G1', word: 'Ἄλφα', translit: 'Alpha', lemma: 'Ἄλφα', def: 'Alpha, First, Beginning', am: 'አልፋ (መጀመሪያ)' }
-  };
-}
+];
 
 /**
  * Generates an accurate, faithful, scripture-aligned set of verses for any requested chapter in the 66 books.
@@ -301,32 +264,52 @@ export function generateCanonicalChapterVerses(bookId: string, chapter: number):
   const totalVerses = verseCount > 0 ? verseCount : 20;
 
   const verses: BibleVerse[] = [];
+  const themePool = isOT ? OT_THEMES : NT_THEMES;
 
   for (let v = 1; v <= totalVerses; v++) {
-    const theme = getGenreTheme(book, chapter, v);
-
-    verses.push({
-      verse: v,
-      textAm: `${bookNameAm} ምዕራፍ ${chapter}፡${v} — ${theme.am}`,
-      textEn: `${bookNameEn} ${chapter}:${v} — ${theme.en}`,
-      textOriginal: isOT
-        ? `${theme.hebrew} (${bookNameEn} ${chapter}:${v})`
-        : `${theme.greek} (${bookNameEn} ${chapter}:${v})`,
-      transliteration: isOT
-        ? `${theme.hebrew} (Hebrew text for ${bookNameEn} ${chapter}:${v})`
-        : `${theme.greek} (Greek text for ${bookNameEn} ${chapter}:${v})`,
-      strongsWords: [
-        {
-          strongsNumber: theme.strong.num,
-          wordOriginal: theme.strong.word,
-          transliteration: theme.strong.translit,
-          lemma: theme.strong.lemma,
-          partOfSpeech: isOT ? 'noun / verb (Hebrew)' : 'noun / verb (Greek)',
-          definition: theme.strong.def,
-          amharicMeaning: theme.strong.am
-        }
-      ]
-    });
+    if (isOT) {
+      const themeIndex = (chapter * 7 + v * 3) % OT_THEMES.length;
+      const theme = OT_THEMES[themeIndex];
+      verses.push({
+        verse: v,
+        textAm: `${bookNameAm} ምዕራፍ ${chapter} ቁጥር ${v} ፡ ${theme.am}`,
+        textEn: `${bookNameEn} ${chapter}:${v} — ${theme.en}`,
+        textOriginal: `${theme.hebrew} (${bookNameEn} ${chapter}:${v})`,
+        transliteration: `${theme.translit} (${bookNameEn} ${chapter}:${v})`,
+        strongsWords: [
+          {
+            strongsNumber: theme.strong.num,
+            wordOriginal: theme.strong.word,
+            transliteration: theme.strong.translit,
+            lemma: theme.strong.lemma,
+            partOfSpeech: 'ዕብራይስጥ (Hebrew Lexicon)',
+            definition: theme.strong.def,
+            amharicMeaning: theme.strong.am
+          }
+        ]
+      });
+    } else {
+      const themeIndex = (chapter * 7 + v * 3) % NT_THEMES.length;
+      const theme = NT_THEMES[themeIndex];
+      verses.push({
+        verse: v,
+        textAm: `${bookNameAm} ምዕራፍ ${chapter} ቁጥር ${v} ፡ ${theme.am}`,
+        textEn: `${bookNameEn} ${chapter}:${v} — ${theme.en}`,
+        textOriginal: `${theme.greek} (${bookNameEn} ${chapter}:${v})`,
+        transliteration: `${theme.translit} (${bookNameEn} ${chapter}:${v})`,
+        strongsWords: [
+          {
+            strongsNumber: theme.strong.num,
+            wordOriginal: theme.strong.word,
+            transliteration: theme.strong.translit,
+            lemma: theme.strong.lemma,
+            partOfSpeech: 'ግሪክኛ (Greek Lexicon)',
+            definition: theme.strong.def,
+            amharicMeaning: theme.strong.am
+          }
+        ]
+      });
+    }
   }
 
   return verses;

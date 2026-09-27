@@ -21,8 +21,8 @@ export default defineConfig(() => {
         ],
         manifest: {
           id: '/',
-          name: 'Kal (ቃል) መጽሐፍ ቅዱስ',
-          short_name: 'Kal Bible',
+          name: 'የሕይወት ብርሃን መጽሐፍ ቅዱስ (Light of Life Holy Bible)',
+          short_name: 'የሕይወት ብርሃን',
           description: 'የወንጌላዊ መጽሐፍ ቅዱስ ንባብ፣ ጥናት፣ የቲኦሎጂ ትንታኔ እና ከመስመር ውጭ የማንበቢያ መተግበሪያ።',
           theme_color: '#d97706',
           background_color: '#0c0a09',

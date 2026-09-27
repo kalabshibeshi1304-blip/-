@@ -35,7 +35,7 @@ export const PWAInstallButton: React.FC = () => {
           id="pwa-ios-install-btn"
           onClick={() => setShowIOSGuide(true)}
           className="flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-950/40 hover:bg-amber-900/40 px-3 py-1.5 text-xs font-medium text-amber-300 transition-colors"
-          title="Install Kal Bible on iPhone/iPad"
+          title="Install Light of Life Bible on iPhone/iPad"
         >
           <Smartphone className="w-3.5 h-3.5 text-amber-400" />
           <span className="hidden sm:inline">በiPhone ላይ ጫን</span>
