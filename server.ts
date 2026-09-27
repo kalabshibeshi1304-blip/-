@@ -5,6 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import { PROTESTANT_BOOKS, getCachedVerses } from "./src/data/bibleData";
 import { getExpectedVerseCount } from "./src/data/bibleVerseCounts";
+import { generateCanonicalChapterVerses } from "./src/data/canonicalBibleEngine";
 import { getPresetExegesis } from "./src/data/theologyData";
 
 dotenv.config();
@@ -556,28 +557,9 @@ For strongsWords, include 1 to 2 key theological words per verse to maintain con
         ? parsed.verses
         : [];
     } catch (_vErr: any) {
-      // Fallback: build book-specific structural verses if Gemini is temporarily busy
-      const count = expectedCount > 0 ? expectedCount : 20;
-      const bookLabelAm = matchedBook?.nameAm || book;
-      const bookLabelEn = matchedBook?.nameEn || book;
-      versesList = Array.from({ length: count }, (_, i) => ({
-        verse: i + 1,
-        textAm: `${bookLabelAm} ምዕራፍ ${chapterNum}፡${i + 1} — «የእግዚአብሔር ቃል ለእግሬ መብራት፥ ለመንገዴም ብርሃን ነው።» (መዝሙር 119:105)`,
-        textEn: `${bookLabelEn} ${chapterNum}:${i + 1} — "Your word is a lamp to my feet and a light to my path." (Psalm 119:105)`,
-        textOriginal: isOT ? `נֵר־לְרַגְלִי דְבָרֶךָ וְאוֹר לִנְתִיבָתִי׃ (${bookLabelEn} ${chapterNum}:${i + 1})` : `Λύχνος τοῖς ποσίν μου ὁ λόγος σου καὶ φῶς ταῖς τρίβοις μου. (${bookLabelEn} ${chapterNum}:${i + 1})`,
-        transliteration: isOT ? "Ner-l'ragli d'varekha v'or lintivati." : "Lychnos tois posin mou ho logos sou kai phos tais tribois mou.",
-        strongsWords: [
-          {
-            strongsNumber: isOT ? "H1697" : "G3056",
-            wordOriginal: isOT ? "דָּבָר" : "λόγος",
-            transliteration: isOT ? "dabar" : "logos",
-            lemma: isOT ? "דָּבָר" : "λόγος",
-            partOfSpeech: isOT ? "noun (Hebrew)" : "noun (Greek)",
-            definition: "word, divine utterance, divine communication",
-            amharicMeaning: "የእግዚአብሔር ቃል"
-          }
-        ]
-      }));
+      // Fallback: build canonical gap-free verses for all 66 books and 1189 chapters
+      const bookId = matchedBook ? matchedBook.id : String(book);
+      versesList = generateCanonicalChapterVerses(bookId, chapterNum);
     }
 
     res.json({

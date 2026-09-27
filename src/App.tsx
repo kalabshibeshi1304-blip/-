@@ -199,10 +199,11 @@ export default function App() {
           Array.isArray(data.verses) &&
           data.verses.length > 0
         ) {
-          setVerses(data.verses);
+          const sortedVerses = [...data.verses].sort((a, b) => a.verse - b.verse);
+          setVerses(sortedVerses);
           setVersesError(null);
           // Persist in local storage for reliable offline access
-          saveOfflineChapter(book.id, ch, book.nameAm, book.nameEn, data.verses);
+          saveOfflineChapter(book.id, ch, book.nameAm, book.nameEn, sortedVerses);
         }
       }
     } catch (_e: any) {
@@ -218,12 +219,36 @@ export default function App() {
     loadChapterVerses(currentBook, currentChapter);
   }, [currentBook, currentChapter, loadChapterVerses]);
 
-  // Navigate between chapters
+  // Seamless navigation between chapters and books across the 66 Protestant canon books
   const handleNavigateChapter = (direction: 'prev' | 'next') => {
-    if (direction === 'prev' && currentChapter > 1) {
-      setCurrentChapter((prev) => prev - 1);
-    } else if (direction === 'next' && currentChapter < currentBook.totalChapters) {
-      setCurrentChapter((prev) => prev + 1);
+    if (direction === 'prev') {
+      if (currentChapter > 1) {
+        setCurrentChapter((prev) => prev - 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        // Go to previous canonical book at its last chapter
+        const currentIndex = PROTESTANT_BOOKS.findIndex((b) => b.id === currentBook.id);
+        if (currentIndex > 0) {
+          const prevBook = PROTESTANT_BOOKS[currentIndex - 1];
+          setCurrentBook(prevBook);
+          setCurrentChapter(prevBook.totalChapters);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    } else if (direction === 'next') {
+      if (currentChapter < currentBook.totalChapters) {
+        setCurrentChapter((prev) => prev + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        // Go to next canonical book at chapter 1
+        const currentIndex = PROTESTANT_BOOKS.findIndex((b) => b.id === currentBook.id);
+        if (currentIndex < PROTESTANT_BOOKS.length - 1) {
+          const nextBook = PROTESTANT_BOOKS[currentIndex + 1];
+          setCurrentBook(nextBook);
+          setCurrentChapter(1);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
     }
   };
 

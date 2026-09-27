@@ -1,5 +1,6 @@
 import { BibleVerse } from '../types';
 import { SEED_CHAPTERS, getBookById } from '../data/bibleData';
+import { getExpectedVerseCount } from '../data/bibleVerseCounts';
 import { generateCanonicalChapterVerses } from '../data/canonicalBibleEngine';
 
 const OFFLINE_CHAPTERS_KEY = 'kal_offline_chapters_v2';
@@ -67,23 +68,20 @@ export function saveOfflineChapter(
 }
 
 /**
- * Retrieves a chapter from offline storage (either curated SEED_CHAPTERS, user-cached chapters, or canonical engine)
+ * Retrieves a chapter from offline storage (guaranteeing complete 1..N contiguous verses)
  */
 export function getOfflineChapter(bookId: string, chapter: number, generateIfMissing: boolean = true): BibleVerse[] | null {
   const key = `${bookId.toUpperCase()}_${chapter}`;
+  const expectedCount = getExpectedVerseCount(bookId, chapter);
 
-  // 1. Check seed curated canonical chapters first
-  if (SEED_CHAPTERS[key] && SEED_CHAPTERS[key].length > 0) {
-    return SEED_CHAPTERS[key];
-  }
-
-  // 2. Check user local persistent cache
+  // 1. Check user local persistent cache if it contains a complete chapter
   const map = getStoredChaptersMap();
-  if (map[key] && map[key].verses && map[key].verses.length > 0) {
-    return map[key].verses;
+  if (map[key] && map[key].verses && map[key].verses.length >= expectedCount) {
+    const sorted = [...map[key].verses].sort((a, b) => a.verse - b.verse);
+    return sorted;
   }
 
-  // 3. If enabled, generate standard canonical chapter verses
+  // 2. Generate or retrieve complete canonical chapter verses (1..N gap-free)
   if (generateIfMissing) {
     const generated = generateCanonicalChapterVerses(bookId, chapter);
     if (generated && generated.length > 0) {

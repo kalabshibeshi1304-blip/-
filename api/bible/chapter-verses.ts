@@ -95,26 +95,20 @@ export default async function handler(req: any, res: any) {
   const bookId = matchedBook ? matchedBook.id : String(bookParam);
   const key = `${bookId.toUpperCase()}_${chapterNum}`;
 
-  // 1. Check static seed chapters first (0ms instant response)
-  if (SEED_CHAPTERS[key] && SEED_CHAPTERS[key].length > 0) {
-    return res.status(200).json({
-      book: matchedBook?.nameAm || bookParam,
-      chapter: chapterNum,
-      verses: SEED_CHAPTERS[key],
-    });
-  }
+  // 1. Get canonical gap-free chapter with authentic seed verses merged
+  const canonicalVerses = generateCanonicalChapterVerses(bookId, chapterNum);
+  const expectedCount = matchedBook ? getExpectedVerseCount(matchedBook.id, chapterNum) : canonicalVerses.length;
 
-  // 2. Check curated canonical chapters (0ms instant response)
-  if (CURATED_CANONICAL_CHAPTERS[key] && CURATED_CANONICAL_CHAPTERS[key].length > 0) {
+  // 2. If we have full complete curated chapter, deliver instantly
+  if (canonicalVerses && canonicalVerses.length >= expectedCount) {
     return res.status(200).json({
       book: matchedBook?.nameAm || bookParam,
       chapter: chapterNum,
-      verses: CURATED_CANONICAL_CHAPTERS[key],
+      verses: canonicalVerses,
     });
   }
 
   const isOT = matchedBook?.testament === 'OT';
-  const expectedCount = matchedBook ? getExpectedVerseCount(matchedBook.id, chapterNum) : 0;
   const originalLangName = isOT
     ? 'Biblical Hebrew (Biblia Hebraica Stuttgartensia / BHS with vowels)'
     : 'Biblical Koine Greek (Novum Testamentum Graece / NA28 with accents)';
