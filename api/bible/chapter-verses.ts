@@ -38,7 +38,7 @@ export default async function handler(req: any, res: any) {
     }
 
     const ai = getGeminiClient();
-    const modelName = 'gemini-2.5-flash';
+    const modelName = 'gemini-3.7-flash';
 
     // እዚህ ጋር የ AI ጥያቄ አሰራር ሎጂኩ ይቀጥላል
     const prompt = `Provide the Bible verses for ${book} chapter ${chapter} in Amharic.`;
