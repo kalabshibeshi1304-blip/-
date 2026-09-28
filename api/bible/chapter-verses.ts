@@ -1,11 +1,10 @@
 import { GoogleGenAI } from '@google/genai';
-import { PROTESTANT_BOOKS } from '../../src/data/bibleData';
-import { getExpectedVerseCount } from '../../src/data/bibleVerseCounts';
-import { SEED_CHAPTERS } from '../../src/data/seedChapters/index';
-import { generateCanonicalChapterVerses, CURATED_CANONICAL_CHAPTERS } from '../../src/data/canonicalBibleEngine';
+import { PROTESTANT_BOOKS } from '../../src/data/booksData'; // እንደ ፎልደር አወቃቀርዎ ትክክለኛውን ፋይል ስም ያስተካክሉ
+import { getExpectedVerseCount } from '../../src/utils/verseCounts'; 
+import { SEED_CHAPTERS } from '../../src/data/seedChapters'; 
 
 function getGeminiClient(): GoogleGenAI {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   if (apiKey) {
     return new GoogleGenAI({
       apiKey,
@@ -17,6 +16,7 @@ function getGeminiClient(): GoogleGenAI {
     });
   }
   return new GoogleGenAI({
+    apiKey: 'dummy-key',
     httpOptions: {
       headers: {
         'User-Agent': 'aistudio-build',
@@ -25,163 +25,38 @@ function getGeminiClient(): GoogleGenAI {
   });
 }
 
-function safeExtractJSON<T = any>(rawText: string | undefined | null): T {
-  if (!rawText) {
-    throw new Error('Empty response from AI model');
-  }
-
-  let text = rawText.trim();
-  if (text.startsWith('```')) {
-    text = text.replace(/^```(?:json)?\s*/i, '');
-    const closingFenceIndex = text.lastIndexOf('```');
-    if (closingFenceIndex !== -1) {
-      text = text.substring(0, closingFenceIndex).trim();
-    }
-  }
-
-  try {
-    return JSON.parse(text);
-  } catch (_e1) {
-    const firstBrace = text.indexOf('{');
-    const firstBracket = text.indexOf('[');
-    let isObject = false;
-    let startIdx = -1;
-    if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
-      isObject = true;
-      startIdx = firstBrace;
-    } else if (firstBracket !== -1) {
-      isObject = false;
-      startIdx = firstBracket;
-    }
-
-    if (startIdx !== -1) {
-      const lastCharIdx = isObject ? text.lastIndexOf('}') : text.lastIndexOf(']');
-      if (lastCharIdx > startIdx) {
-        try {
-          return JSON.parse(text.substring(startIdx, lastCharIdx + 1));
-        } catch (_e2) {
-          // Fallback
-        }
-      }
-    }
-    throw new Error(`Failed to parse JSON: ${text.slice(0, 100)}`);
-  }
-}
-
 export default async function handler(req: any, res: any) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+  if (req.method !== 'GET' && req.method !== 'POST') {
+    return res.status(405.json({ error: 'Method Not Allowed' }));
   }
 
-  const bookParam = req.query.book || req.body?.book;
-  const chapterParam = req.query.chapter || req.body?.chapter;
-
-  if (!bookParam || !chapterParam) {
-    return res.status(400).json({ error: 'Book and chapter are required' });
-  }
-
-  const chapterNum = Number(chapterParam);
-  const matchedBook = PROTESTANT_BOOKS.find(
-    (b) =>
-      b.nameAm === bookParam ||
-      b.nameEn.toLowerCase() === String(bookParam).toLowerCase() ||
-      b.id.toUpperCase() === String(bookParam).toUpperCase()
-  );
-
-  const bookId = matchedBook ? matchedBook.id : String(bookParam);
-  const key = `${bookId.toUpperCase()}_${chapterNum}`;
-
-  // 1. Get canonical gap-free chapter with authentic seed verses merged
-  const canonicalVerses = generateCanonicalChapterVerses(bookId, chapterNum);
-  const expectedCount = matchedBook ? getExpectedVerseCount(matchedBook.id, chapterNum) : canonicalVerses.length;
-
-  // 2. If we have full complete curated chapter, deliver instantly
-  if (canonicalVerses && canonicalVerses.length >= expectedCount) {
-    return res.status(200).json({
-      book: matchedBook?.nameAm || bookParam,
-      chapter: chapterNum,
-      verses: canonicalVerses,
-    });
-  }
-
-  const isOT = matchedBook?.testament === 'OT';
-  const originalLangName = isOT
-    ? 'Biblical Hebrew (Biblia Hebraica Stuttgartensia / BHS with vowels)'
-    : 'Biblical Koine Greek (Novum Testamentum Graece / NA28 with accents)';
-
-  // 3. Attempt AI enrichment if Gemini API is available
   try {
-    const ai = getGeminiClient();
-    const systemInstruction =
-      'You are a high-precision Ethiopian Protestant Bible database API. Output strictly raw valid JSON without markdown formatting or code blocks.';
+    const { book, chapter } = req.method === 'GET' ? req.query : req.body;
 
-    const prompt = `Generate the full verses of ${matchedBook?.nameAm || bookParam} (${matchedBook?.nameEn || bookParam}) Chapter ${chapterNum} according to the Ethiopian Bible Society 1962 EC Amharic Bible and ESV English with ${originalLangName}.
-${expectedCount > 0 ? `Must contain exactly ${expectedCount} verses (1 to ${expectedCount}).` : ''}
-
-JSON Schema:
-{
-  "book": "${matchedBook?.nameAm || bookParam}",
-  "chapter": ${chapterNum},
-  "verses": [
-    {
-      "verse": 1,
-      "textAm": "የተሟላ ትክክለኛ የአማርኛ ጥቅስ ጽሑፍ",
-      "textEn": "Faithful English ESV translation",
-      "textOriginal": "Original Hebrew/Greek text",
-      "transliteration": "Phonetic transliteration",
-      "strongsWords": [
-        {
-          "strongsNumber": "${isOT ? 'H...' : 'G...'}",
-          "wordOriginal": "word",
-          "transliteration": "transliteration",
-          "lemma": "root lemma",
-          "partOfSpeech": "noun/verb",
-          "definition": "lexical definition",
-          "amharicMeaning": "የቃሉ ቀጥተኛ ፍቺ"
-        }
-      ]
+    if (!book || !chapter) {
+      return res.status(400).json({ error: 'Book and chapter are required' });
     }
-  ]
-}`;
 
+    const ai = getGeminiClient();
+    const modelName = 'gemini-2.5-flash';
+
+    // እዚህ ጋር የ AI ጥያቄ አሰራር ሎጂኩ ይቀጥላል
+    const prompt = `Provide the Bible verses for ${book} chapter ${chapter} in Amharic.`;
+    
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      config: {
-        systemInstruction,
-        responseMimeType: 'application/json',
-        temperature: 0.1,
-      },
+      model: modelName,
+      contents: prompt,
     });
 
-    const parsed = safeExtractJSON(response.text);
-    const versesList = Array.isArray(parsed)
-      ? parsed
-      : Array.isArray(parsed?.verses)
-      ? parsed.verses
-      : [];
+    return res.status(200).json({ 
+      success: true, 
+      book, 
+      chapter, 
+      content: response.text || '' 
+    });
 
-    if (versesList.length > 0) {
-      return res.status(200).json({
-        book: matchedBook?.nameAm || bookParam,
-        chapter: chapterNum,
-        verses: versesList,
-      });
-    }
-  } catch (err: any) {
-    console.warn('Vercel serverless chapter-verses dynamic generation fallback:', err?.message || err);
+  } catch (error: any) {
+    console.error('API Error:', error);
+    return res.status(500).json({ error: error.message || 'Internal Server Error' });
   }
-
-  // 4. Reliable canonical engine fallback for all 66 books and 1189 chapters
-  const fallbackVerses = generateCanonicalChapterVerses(bookId, chapterNum);
-
-  return res.status(200).json({
-    book: matchedBook?.nameAm || bookParam,
-    chapter: chapterNum,
-    verses: fallbackVerses,
-  });
 }
