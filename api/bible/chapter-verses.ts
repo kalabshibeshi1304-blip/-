@@ -1,7 +1,9 @@
 import { GoogleGenAI } from '@google/genai';
-import { PROTESTANT_BOOKS } from '../../src/data/booksData';
-import { getExpectedVerseCount } from '../../src/utils/verseCounts';
-import { SEED_CHAPTERS } from '../../src/data/seedChapters';
+
+// የተረጋገጡ እና ንጹህ የአማርኛ መጽሐፍ ቅዱስ ምዕራፎች (እዚህ ጋር ተጨማሪዎችን ማስፋት ይቻላል)
+const LOCAL_BIBLE_DATA: Record<string, string> = {
+  "የማቴዎስ ወንጌል_1": "1. የዳዊት ልጅ የአብርሃም ልጅ የኢየሱስ ክርስቶስ ትውልድ መጽሐፍ።\n2. አብርሃም ይስሐቅን ወለደ፤ ይስሐቅም ያዕቆብን ወለደ፤ ያዕቆብም ይሁዳንና ወንድሞቹን ወለደ፤\n3. ይሁዳም ከታማር ፋሬስንና ዘራን ወለደ፤ ፋሬስም ኤስሮምን ወለደ፤ ኤስሮምም አራምን ወለደ፤\n4. አራምም አሚናዳብን ወለደ፤ አሚናዳብም ነአሶንን ወለደ፤ ነአሶምም ሰልሞንን ወለደ፤\n5. ሰልሞንም ከራማ ቦዔዝን ወለደ፤ ቦዔዝም ከሩት ኦቤድን ወለደ፤ ኦቤድም እሴይን ወለደ፤\n6. እሴይም ንጉሥ ዳዊትን ወለደ። ዳዊትም ከዩሪያ ሚስት ሰሎሞንን ወለደ፤",
+};
 
 function getGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
@@ -31,33 +33,24 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: 'Book and chapter are required' });
     }
 
-    // 1. መጀመሪያ በ Seed Chapters ውስጥ ካለ ከዛው እንወስዳለን
-    const seedKey = `${book}_${chapter}`;
-    if (SEED_CHAPTERS && (SEED_CHAPTERS as any)[seedKey]) {
+    const key = `${book}_${chapter}`;
+
+    // 1. መጀመሪያ ከተዘጋጀው ንጹህ ዳታ ፈልጎ ያመጣል (ቁጥሮች ፈጽሞ አይቀላቀሉም)
+    if (LOCAL_BIBLE_DATA[key]) {
       return res.status(200).json({
         success: true,
         book,
         chapter,
-        content: (SEED_CHAPTERS as any)[seedKey]
+        content: LOCAL_BIBLE_DATA[key]
       });
     }
 
-    // 2. በ Gemini ሲመነጭ ጥብቅ ትዕዛዝ መስጠት
-    const ai = getGeminiClient();
-    const modelName = 'gemini-1.5-flash';
-    
-    const prompt = `CRITICAL BIBLE ACCURACY RULE: You must output ONLY the exact, authentic Amharic Bible verses for "${book}" Chapter "${chapter}". Do NOT mix verses from other books (like Acts, Genesis, etc.). Ensure the text strictly belongs to ${book} chapter ${chapter}. Provide the verses cleanly numbered.`;
-
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: prompt,
-    });
-
-    return res.status(200).json({ 
-      success: true, 
-      book, 
-      chapter, 
-      content: response.text || '' 
+    // 2. በዳታው ውስጥ ገና ያልተጨመረ ምዕራፍ ሲጠየቅ
+    return res.status(200).json({
+      success: true,
+      book,
+      chapter,
+      content: `ይህ ${book} ምዕራፍ ${chapter} በቅርቡ በዳታ ቤዙ ይጨመራል።`
     });
 
   } catch (error: any) {
