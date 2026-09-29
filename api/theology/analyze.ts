@@ -50,9 +50,9 @@ function buildFallbackTheologicalAnalysis(
 5. **Soli Deo Gloria (ለእግዚአብሔር ክብር ብቻ)**: በድነታችንና በሕይወታችን ውስጥ ክብርና ምስጋና ሁሉ ለቅድስት ሥላሴ ብቻ ይገባል (ሮሜ 11:36)።
 
 ### 🔍 የቃላት ጥናትና አገናዛቢ ጥቅሶች (Original Language Insights & Cross-References)
-- **ጸጋ (Charis / χάሪስ - ኖህ / חֵን)**: ያለ ምንም የሰው ዋጋ ወይም ብቃት የሚሰጥ ፍጹም መለኮታዊ ሞገስ።
-- **እምነት (Pistis / πίστις - ኤሙና / אֱמוּנָה)**: በእግዚአብሔር ተስፋና በክርስቶስ የማዳን ሥራ ላይ ያረፈ ጽኑ መደገፍና ታማኝነት።
-- **ጽድቅ (Dikaiosyne / δικαιοσύνη - ጼዴቅ / צֶድֶק)**: ክርስቶስ ያገኘውን ፍጹም ጽድቅ በእኛ ላይ መቁጠር (Imputation of Righteousness)።
+- **ጸጋ (Charis / χάρις - ኖህ / חֵן)**: ያለ ምንም የሰው ዋጋ ወይም ብቃት የሚሰጥ ፍጹም መለኮታዊ ሞገስ።
+- **እምነት (Pistis / πίστιස් - ኤሙና / אֱמוּנָה)**: በእግዚአብሔር ተስፋና በክርስቶስ የማዳን ሥራ ላይ ያረፈ ጽኑ መደገፍና ታማኝነት።
+- **ጽድቅ (Dikaiosyne / δικαιοσύνη - ጼዴቅ / צֶדֶק)**: ክርስቶስ ያገኘውን ፍጹም ጽድቅ በእኛ ላይ መቁጠር (Imputation of Righteousness)።
 - **አገናዛቢ ጥቅሶች**: ዮሐንስ 14:6፤ ሮሜ 8:1-4፤ ገላትያ 2:20፤ ዕብራውያን 4:16።
 
 ### 🕊️ ለግል ሕይወት ተግባራዊ አተገባበር (Practical Spiritual Application)
@@ -69,17 +69,23 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  let body = req.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch (_e) {
+      body = {};
+    }
   }
+  body = body || {};
 
-  const { book, chapter, verseStart, verseEnd, passageText, analysisType } = req.body || {};
+  const { book, chapter, verseStart, verseEnd, passageText, analysisType } = body;
 
   try {
     const ai = getGeminiClient();
     const prompt = `Perform an in-depth Evangelical Protestant theological exegesis (ሥነ-መለኮታዊ ትንታኔ) for:
-Book: ${book}
-Chapter: ${chapter}
+Book: ${book || 'መጽሐፍ ቅዱስ'}
+Chapter: ${chapter || 1}
 ${verseStart ? `Verse Range: ${verseStart}${verseEnd ? `-${verseEnd}` : ''}` : 'Full Chapter'}
 ${passageText ? `Passage Text: "${passageText}"` : ''}
 Analysis Focus: ${analysisType || 'depth'}
@@ -102,7 +108,7 @@ Use markdown formatting with headers, bullet points, and bold text.`;
     return res.status(200).json({ analysis });
   } catch (err: any) {
     console.warn('Vercel serverless analyze fallback triggered:', err?.message || err);
-    const fallback = buildFallbackTheologicalAnalysis(book || 'መጽሐፍ', chapter || 1, verseStart, verseEnd);
+    const fallback = buildFallbackTheologicalAnalysis(book || 'መጽሐፍ ቅዱስ', chapter || 1, verseStart, verseEnd);
     return res.status(200).json({ analysis: fallback });
   }
 }
