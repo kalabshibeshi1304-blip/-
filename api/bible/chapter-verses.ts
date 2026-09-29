@@ -31,7 +31,7 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: 'Book and chapter are required' });
     }
 
-    // 1. መጀመሪያ በ Seed Chapters ውስጥ የተረጋገጠ ዳታ ካለ ከዛው እንወስዳለን (ቁጥሮቹ እንዳይቀላቀሉ)
+    // 1. መጀመሪያ በ Seed Chapters ውስጥ ካለ ከዛው እንወስዳለን
     const seedKey = `${book}_${chapter}`;
     if (SEED_CHAPTERS && (SEED_CHAPTERS as any)[seedKey]) {
       return res.status(200).json({
@@ -42,13 +42,11 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    // 2. ከሌለ በ Gemini እናመነጫለን ግን ጥብቅ ማስተካከያ እናደርጋለን
+    // 2. በ Gemini ሲመነጭ ጥብቅ ትዕዛዝ መስጠት
     const ai = getGeminiClient();
     const modelName = 'gemini-1.5-flash';
     
-    const expectedCount = getExpectedVerseCount ? getExpectedVerseCount(book, Number(chapter)) : 30;
-
-    const prompt = `You are a strict and accurate Bible API. Provide ONLY the exact verses for ${book} chapter ${chapter} in Amharic. There must be precisely around ${expectedCount} verses. Do not mix with other chapters, do not skip verse numbers, and do not include any introductory or concluding remarks. Format clearly as '1. [verse]', '2. [verse]' etc.`;
+    const prompt = `CRITICAL BIBLE ACCURACY RULE: You must output ONLY the exact, authentic Amharic Bible verses for "${book}" Chapter "${chapter}". Do NOT mix verses from other books (like Acts, Genesis, etc.). Ensure the text strictly belongs to ${book} chapter ${chapter}. Provide the verses cleanly numbered.`;
 
     const response = await ai.models.generateContent({
       model: modelName,
