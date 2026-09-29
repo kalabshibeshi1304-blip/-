@@ -32,10 +32,10 @@ export default async function handler(req: any, res: any) {
     }
 
     const ai = getGeminiClient();
-    const modelName = 'gemini-3.7-flash';
+    // የተረጋጋውን እና በሰርቨር የሚሰራውን ሞዴል እንጠቀማለን
+    const modelName = 'gemini-1.5-flash';
 
-    // ቁጥሮቹ እንዳይቀላቀሉ ጥብቅ ትዕዛዝ የሚሰጠው ፕራምፕት
-    const prompt = `You are a precise Bible API. Provide ONLY the exact verses for ${book} chapter ${chapter} in Amharic. Do not mix with other chapters or books. Ensure the verse numbers match correctly.`;
+    const prompt = `Provide the exact Bible verses for ${book} chapter ${chapter} in Amharic accurately. Do not mix with other chapters.`;
 
     const response = await ai.models.generateContent({
       model: modelName,
@@ -50,7 +50,10 @@ export default async function handler(req: any, res: any) {
     });
 
   } catch (error: any) {
-    console.error('API Error:', error);
-    return res.status(500).json({ error: error.message || 'Internal Server Error' });
+    console.error('API Error Details:', error);
+    return res.status(500).json({ 
+      error: 'Internal Server Error', 
+      details: error.message || String(error) 
+    });
   }
 }
