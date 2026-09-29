@@ -39,11 +39,10 @@ function buildFallbackTheologyAnswer(question: string, context?: string): string
 
 ${context ? `\n**የተጠቀሰው መጽሐፍ ቅዱሳዊ አውድ**: ${context}` : ''}
 
-*ለተጨማሪ ማብራሪያና ጥልቅ ጥናት ተዛማጅ ክፍሎችን በቤሪያን የጥናት መጽሐፍ ቅዱስ ውስጥ ማንበብና ማሰላሰል ይችላሉ።*`;
+*ለተጨማሪ ማብራሪያና ጥልቅ ጥናት ተዛማጅ ክፍሎችን በመጽሐፍ ቅዱስ መተግበሪያው ውስጥ ማንበብና ማሰላሰል ይችላሉ።*`;
 }
 
 export default async function handler(req: any, res: any) {
-  // Support CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -52,13 +51,21 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  let body = req.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch (_e) {
+      body = {};
+    }
   }
+  body = body || {};
 
-  const { question, currentContext } = req.body || {};
+  const { question, currentContext } = body;
   if (!question || typeof question !== 'string') {
-    return res.status(400).json({ error: 'ጥያቄ አልተሰጠም (Question is required)' });
+    return res.status(200).json({
+      answer: buildFallbackTheologyAnswer('የወንጌል እውነትና ጸጋ', currentContext),
+    });
   }
 
   try {
