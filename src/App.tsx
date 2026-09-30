@@ -216,9 +216,47 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    loadChapterVerses(currentBook, currentChapter);
-  }, [currentBook, currentChapter, loadChapterVerses]);
+  
+const loadChapterVerses = useCallback(async (book: BibleBook, chapter: number) => {
+  if (!book || !chapter) return;
 
+  setIsLoadingVerses(true);
+  setVersesError(null);
+
+  try {
+    // 1. መረጃውን ከሰርቨር API መጠየቅ (ለአማርኛ፣ እንግሊዘኛ፣ ግሪክ እና ዕብራይስጥ)
+    const response = await fetch(`/api/bible/chapter-verses?book=${book.id}&chapter=${chapter}`);
+    
+    if (!response.ok) {
+      throw new Error('መረጃውን ከሰርቨር ማምጣት አልተቻለም');
+    }
+
+    const data = await response.json();
+
+    if (data && data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
+      const sortedVerses = [...data.verses].sort((a, b) => a.verse - b.verse);
+      setVerses(sortedVerses);
+      
+      // ከመስመር ውጭ (Offline) ማስቀመጥ ከፈለጉ
+      saveOfflineChapter(book.id, chapter, book.nameAm, book.nameEn, sortedVerses);
+    } else {
+      setVersesError('ለዚህ ምዕራፍ የተገኘ መረጃ የለም');
+      setVerses([]);
+    }
+  } catch (error: any) {
+    console.error('API Fetch Error:', error);
+    // ከሰርቨር ማምጣት ካልተቻለ ከካች (Cache) ወይም ከመስመር ውጭ ካለ ለማንበብ መሞከር
+    const cached = getCachedVerses(book.id, chapter) || getOfflineChapter(book.id, chapter);
+    if (cached && cached.length > 0) {
+      setVerses(cached);
+    } else {
+      setVersesError('እባክዎ የኢንተርኔት ግንኙነትዎን ይፈትሹ');
+      setVerses([]);
+    }
+  } finally {
+    setIsLoadingVerses(false);
+  }
+}, [showEnglishParallel]);
   // Seamless navigation between chapters and books across the 66 Protestant canon books
   const handleNavigateChapter = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
