@@ -15,9 +15,11 @@ export default async function handler(req: any, res: any) {
     const { book, chapter } = req.method === 'GET' ? req.query : req.body;
 
     if (!book || !chapter) {
-      return res.status(400).json({ error: 'Book and chapter are required' });
-    }
-
+try {
+  // መረጃውን ከ Query Parameters (req.query) መቀበል
+  const book = req.query.book as string;
+  const chapter = req.query.chapter ? Number(req.query.chapter) : null;
+  // ...
     // የተረጋገጡ እና ንጹህ ቃላት (ቁጥሮቹ ፈጽሞ እንዳይቀላቀሉ)
     const BIBLE_DATABASE: Record<string, string> = {
       "የማቴዎስ ወንጌል_1": "1. የዳዊት ልጅ የአብርሃም ልጅ የኢየሱስ ክርስቶስ ትውልድ መጽሐፍ።\n2. አብርሃም ይስሐቅን ወለደ፤ ይስሐቅም ያዕቆብን ወለደ፤ ያዕቆብም ይሁዳንና ወንድሞቹን ወለደ፤\n3. ይሁዳም ከታማር ፋሬስንና ዘራን ወለደ፤ ፋሬስም ኤስሮምን ወለደ፤ ኤስሮምም አራምን ወለደ፤\n4. አራምም አሚናዳብን ወለደ፤ አሚናዳብም ነአሶንን ወለደ፤ ነአሶምም ሰልሞንን ወለደ፤\n5. ሰልሞንም ከራማ ቦዔዝን ወለደ፤ ቦዔዝም ከሩት ኦቤድን ወለደ፤ ኦቤድም እሴይን ወለደ፤\n6. እሴይም ንጉሥ ዳዊትን ወለደ። ዳዊትም ከዩሪያ ሚስት ሰሎሞንን ወለደ፤",
