@@ -11,10 +11,6 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  try {
-    const { book, chapter } = req.method === 'GET' ? req.query : req.body;
-
-    if (!book || !chapter) {
 try {
   // መረጃውን ከ Query Parameters (req.query) መቀበል
   const book = req.query.book as string;
