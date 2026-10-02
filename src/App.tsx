@@ -32,6 +32,8 @@ import {
   saveOfflineChapter, 
   initializeSeedChaptersInOfflineStorage 
 } from './utils/offlineBibleStorage';
+import { fetchAuthenticChapter } from './utils/authenticBibleProvider';
+import { getLocalChapterVerses } from './data/localBibleDatabase';
 import { checkIsUnlocked } from './utils/securityManager';
 
 export default function App() {
@@ -169,45 +171,36 @@ export default function App() {
   const activeChapterRef = React.useRef({ bookId: currentBook.id, chapter: currentChapter });
   activeChapterRef.current = { bookId: currentBook.id, chapter: currentChapter };
 
-  // Load verses with instant canonical display and background enrichment
+  // Load verses with instant authentic display from Local JSON dataset and seamless background enrichment
   const loadChapterVerses = useCallback(async (book: BibleBook, ch: number) => {
     setVersesError(null);
     activeChapterRef.current = { bookId: book.id, chapter: ch };
 
-    // 1. Immediately retrieve verses from cache or canonical engine (0ms instant display)
-    const immediateVerses = getOfflineChapter(book.id, ch, true);
-    if (immediateVerses && immediateVerses.length > 0) {
-      setVerses(immediateVerses);
+    // 1. Immediately retrieve verses from Local JSON database or verified offline cache (0ms instant display)
+    const localVerses = getLocalChapterVerses(book.id, ch) || getOfflineChapter(book.id, ch, false);
+    if (localVerses && localVerses.length > 0) {
+      setVerses(localVerses);
+      setIsLoadingVerses(false);
+    } else {
+      // Clear previous chapter's verses immediately to prevent leaking stale verses
+      setVerses([]);
+      setIsLoadingVerses(true);
     }
 
-    // 2. In background, attempt to fetch enriched verses from backend if available
+    // 2. Fetch authentic Amharic chapter from authentic Bible provider
     try {
-      const url = `/api/bible/chapter-verses?book=${encodeURIComponent(book.nameAm)}&chapter=${ch}`;
-      const res = await fetch(url, {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        // Guard against race conditions: only update state if user is still on the same book & chapter
-        if (
-          activeChapterRef.current.bookId === book.id &&
-          activeChapterRef.current.chapter === ch &&
-          data &&
-          data.verses &&
-          Array.isArray(data.verses) &&
-          data.verses.length > 0
-        ) {
-          const sortedVerses = [...data.verses].sort((a, b) => a.verse - b.verse);
-          setVerses(sortedVerses);
-          setVersesError(null);
-          // Persist in local storage for reliable offline access
-          saveOfflineChapter(book.id, ch, book.nameAm, book.nameEn, sortedVerses);
-        }
+      const authenticVerses = await fetchAuthenticChapter(book, ch);
+      if (
+        activeChapterRef.current.bookId === book.id &&
+        activeChapterRef.current.chapter === ch &&
+        authenticVerses &&
+        authenticVerses.length > 0
+      ) {
+        setVerses(authenticVerses);
+        setVersesError(null);
       }
     } catch (_e: any) {
-      // If offline or hosted on static Vercel, the immediate canonical verses are already actively displaying!
+      // If network fails, keep whatever is already loaded
     } finally {
       if (activeChapterRef.current.bookId === book.id && activeChapterRef.current.chapter === ch) {
         setIsLoadingVerses(false);
@@ -216,47 +209,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-  
-const loadChapterVerses = useCallback(async (book: BibleBook, chapter: number) => {
-  if (!book || !chapter) return;
+    loadChapterVerses(currentBook, currentChapter);
+  }, [currentBook, currentChapter, loadChapterVerses]);
 
-  setIsLoadingVerses(true);
-  setVersesError(null);
-
-  try {
-    // 1. መረጃውን ከሰርቨር API መጠየቅ (ለአማርኛ፣ እንግሊዘኛ፣ ግሪክ እና ዕብራይስጥ)
-    const response = await fetch(`/api/bible/chapter-verses?book=${book.id}&chapter=${chapter}`);
-    
-    if (!response.ok) {
-      throw new Error('መረጃውን ከሰርቨር ማምጣት አልተቻለም');
-    }
-
-    const data = await response.json();
-
-    if (data && data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
-      const sortedVerses = [...data.verses].sort((a, b) => a.verse - b.verse);
-      setVerses(sortedVerses);
-      
-      // ከመስመር ውጭ (Offline) ማስቀመጥ ከፈለጉ
-      saveOfflineChapter(book.id, chapter, book.nameAm, book.nameEn, sortedVerses);
-    } else {
-      setVersesError('ለዚህ ምዕራፍ የተገኘ መረጃ የለም');
-      setVerses([]);
-    }
-  } catch (error: any) {
-    console.error('API Fetch Error:', error);
-    // ከሰርቨር ማምጣት ካልተቻለ ከካች (Cache) ወይም ከመስመር ውጭ ካለ ለማንበብ መሞከር
-    const cached = getCachedVerses(book.id, chapter) || getOfflineChapter(book.id, chapter);
-    if (cached && cached.length > 0) {
-      setVerses(cached);
-    } else {
-      setVersesError('እባክዎ የኢንተርኔት ግንኙነትዎን ይፈትሹ');
-      setVerses([]);
-    }
-  } finally {
-    setIsLoadingVerses(false);
-  }
-}, [showEnglishParallel]);
   // Seamless navigation between chapters and books across the 66 Protestant canon books
   const handleNavigateChapter = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
@@ -695,5 +650,4 @@ const loadChapterVerses = useCallback(async (book: BibleBook, chapter: number) =
       />
     </div>
   );
-}}
 }
