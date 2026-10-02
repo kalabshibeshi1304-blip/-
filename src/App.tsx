@@ -695,4 +695,5 @@ const loadChapterVerses = useCallback(async (book: BibleBook, chapter: number) =
       />
     </div>
   );
+}}
 }
