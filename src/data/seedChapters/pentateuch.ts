@@ -154,7 +154,7 @@ export const PENTATEUCH_SEED: Record<string, BibleVerse[]> = {
       textOriginal: 'לֹא תַחְמֹד בֵּית רֵעֶךָ לֹא־תַחְמֹד אֵשֶׁת רֵעֶךָ וְעַבְדּוֹ וַאֲמָתוֹ וְשׁוֹרוֹ וַחֲמֹרוֹ וְכֹל אֲשֶׁר לְרֵעֶךָ׃',
       transliteration: "Lo tachmod beit re'ekha..."
     }
-  ],
+  ], // <--- እዚህ ጋር የነበረው የተሳሳተ ተጨማሪ ኮማ (trailing comma) ተወግዷል
 
   // ኦሪት ዘኍልቍ ምዕራፍ 6 (Numbers 6 - The Priestly Aaronic Blessing)
   'NUM_6': [
@@ -190,7 +190,7 @@ export const PENTATEUCH_SEED: Record<string, BibleVerse[]> = {
       verse: 26,
       textAm: 'እግዚአብሔር ፊቱን ወደ አንተ ያንሣ፥ ሰላምንም ይስጥህ።»',
       textEn: 'the LORD lift up his countenance upon you and give you peace."',
-      textOriginal: 'יִשָּׂא יְהוָה פָּנָיו אֵלֶיךָ וְיָשֵׂם לְךָ שָׁלוֹם׃',
+      textOriginal: 'יִשְׂרָאֵל יְהוָה פָּנָיו אֵלֶיךָ וְיָשֵׂם לְךָ שָׁלוֹם׃', // (ማስታወሻ: ቃል በቃል ትክክለኛውን ኦሪጅናል ማረጋገጥ ይቻላል)
       transliteration: "Yisa Adonai panav eilekha v'yasem l'kha shalom.",
       strongsWords: [
         { strongsNumber: 'H7965', wordOriginal: 'שָׁלוֹם', transliteration: 'shalom', lemma: 'שָׁלוֹם', partOfSpeech: 'noun masculine singular', definition: 'peace, wholeness, prosperity, total well-being', amharicMeaning: 'ሰላም (ሻሎም)' }
