@@ -1,5 +1,4 @@
 // Protestant Bible Standard Chapter Verse Counts (66 Books, 1,189 Chapters)
-
 export const BIBLE_CHAPTER_VERSE_COUNTS: Record<string, number[]> = {
   // Pentateuch (ሕግ)
   GEN: [31, 25, 24, 26, 32, 22, 24, 22, 29, 32, 32, 20, 18, 24, 21, 16, 27, 33, 38, 18, 34, 24, 20, 67, 34, 35, 46, 22, 35, 43, 55, 32, 20, 31, 29, 43, 36, 30, 23, 23, 57, 38, 34, 34, 28, 34, 31, 22, 33, 26],
@@ -88,7 +87,7 @@ export const BIBLE_CHAPTER_VERSE_COUNTS: Record<string, number[]> = {
   '2JN': [13],
   '3JN': [14],
   JUD: [25],
-  REV: [20, 29, 22, 11, 14, 17, 17, 13, 21, 11, 19, 17, 18, 20, 8, 21, 18, 24, 21, 15, 27, 21],
+  REV: [20, 29, 22, 11, 14, 17, 17, 13, 21, 11, 19, 17, 18, 20, 8, 21, 18, 24, 21, 15, 27, 21]
 };
 
 export function getExpectedVerseCount(bookId: string, chapter: number): number {
