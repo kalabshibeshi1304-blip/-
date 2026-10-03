@@ -5,7 +5,8 @@ import { getExpectedVerseCount } from './bibleVerseCounts';
 export { SEED_CHAPTERS };
 
 export const PROTESTANT_BOOKS: BibleBook[] = [
-  // ===================== ብሉይ ኪዳን (OLD TESTAMENT - 39 BOOKS - HEBREW / עברית) =====================
+  // ===================== ብሉይ ኪዳን (OLD TESTAMENT - 39 BOOKS) =====================
+  
   // የሕግ መጻሕፍት (Pentateuch / Torah)
   { id: 'GEN', order: 1, nameAm: 'ኦሪት ዘፍጥረት', nameEn: 'Genesis', nameOriginal: 'בְּרֵאשִׁית', transliteration: "B'reshit", abbrAm: 'ዘፍ', abbrEn: 'Gen', testament: 'OT', category: 'ሕግ', originalLang: 'hebrew', originalLanguageName: 'ዕብራይስጥ (עברית / BHS)', totalChapters: 50 },
   { id: 'EXO', order: 2, nameAm: 'ኦሪት ዘጸአት', nameEn: 'Exodus', nameOriginal: 'שְׁמוֹת', transliteration: 'Shemot', abbrAm: 'ዘጸ', abbrEn: 'Exo', testament: 'OT', category: 'ሕግ', originalLang: 'hebrew', originalLanguageName: 'ዕብራይስጥ (עברית / BHS)', totalChapters: 40 },
@@ -55,7 +56,8 @@ export const PROTESTANT_BOOKS: BibleBook[] = [
   { id: 'ZEC', order: 38, nameAm: 'ትንቢተ ዘካርያስ', nameEn: 'Zechariah', nameOriginal: 'זְכַרְיָה', transliteration: 'Zekharyah', abbrAm: 'ዘካ', abbrEn: 'Zec', testament: 'OT', category: 'ደቂቀ ነቢያት', originalLang: 'hebrew', originalLanguageName: 'ዕብራይስጥ (עברית / BHS)', totalChapters: 14 },
   { id: 'MAL', order: 39, nameAm: 'ትንቢተ ሚልክያስ', nameEn: 'Malachi', nameOriginal: 'מַלְאָכִי', transliteration: 'Malakhi', abbrAm: 'ሚል', abbrEn: 'Mal', testament: 'OT', category: 'ደቂቀ ነቢያት', originalLang: 'hebrew', originalLanguageName: 'ዕብራይስጥ (עברית / BHS)', totalChapters: 4 },
 
-  // ===================== አዲስ ኪዳን (NEW TESTAMENT - 27 BOOKS - GREEK / Ἑλληνική) =====================
+  // ===================== አዲስ ኪዳን (NEW TESTAMENT - 27 BOOKS) =====================
+  
   // ወንጌላት (The Four Gospels)
   { id: 'MAT', order: 40, nameAm: 'የማቴዎስ ወንጌል', nameEn: 'Matthew', nameOriginal: 'Κατὰ Μαθθαῖον', transliteration: 'Kata Matthaion', abbrAm: 'ማቴ', abbrEn: 'Mat', testament: 'NT', category: 'ወንጌላት', originalLang: 'greek', originalLanguageName: 'ግሪክኛ (Ἑλληνική / NA28)', totalChapters: 28 },
   { id: 'MRK', order: 41, nameAm: 'የማርቆስ ወንጌል', nameEn: 'Mark', nameOriginal: 'Κατὰ Μᾶρκον', transliteration: 'Kata Markon', abbrAm: 'ማር', abbrEn: 'Mrk', testament: 'NT', category: 'ወንጌላት', originalLang: 'greek', originalLanguageName: 'ግሪክኛ (Ἑλληνική / NA28)', totalChapters: 16 },
@@ -65,7 +67,7 @@ export const PROTESTANT_BOOKS: BibleBook[] = [
   // የታሪክ መጽሐፍ (Church History)
   { id: 'ACT', order: 44, nameAm: 'የሐዋርያት ሥራ', nameEn: 'Acts', nameOriginal: 'Πράξεις Ἀποστόλων', transliteration: 'Praxeis Apostolon', abbrAm: 'የሐዋ', abbrEn: 'Act', testament: 'NT', category: 'የሐዋርያት ሥራ', originalLang: 'greek', originalLanguageName: 'ግሪክኛ (Ἑλληνική / NA28)', totalChapters: 28 },
 
-  // የጳውሎስ መልእክቶች (Pauline Epistles - 14 / 13+Hebrews)
+  // የጳውሎስ መልእክቶች (Pauline Epistles)
   { id: 'ROM', order: 45, nameAm: 'ወደ ሮሜ ሰዎች', nameEn: 'Romans', nameOriginal: 'Πρὸς Ῥωμαίους', transliteration: 'Pros Romaious', abbrAm: 'ሮሜ', abbrEn: 'Rom', testament: 'NT', category: 'የጳውሎስ መልእክቶች', originalLang: 'greek', originalLanguageName: 'ግሪክኛ (Ἑλληνική / NA28)', totalChapters: 16 },
   { id: '1CO', order: 46, nameAm: '1ኛ ቆሮንቶስ', nameEn: '1 Corinthians', nameOriginal: 'Πρὸς Κορινθίους Α΄', transliteration: 'Pros Korinthious A', abbrAm: '1ቆሮ', abbrEn: '1Co', testament: 'NT', category: 'የጳውሎስ መልእክቶች', originalLang: 'greek', originalLanguageName: 'ግሪክኛ (Ἑλληνική / NA28)', totalChapters: 16 },
   { id: '2CO', order: 47, nameAm: '2ኛ ቆሮንቶስ', nameEn: '2 Corinthians', nameOriginal: 'Πρὸς Κορινθίους Β΄', transliteration: 'Pros Korinthious B', abbrAm: '2ቆሮ', abbrEn: '2Co', testament: 'NT', category: 'የጳውሎስ መልእክቶች', originalLang: 'greek', originalLanguageName: 'ግሪክኛ (Ἑλληνική / NA28)', totalChapters: 13 },
@@ -94,8 +96,14 @@ export const PROTESTANT_BOOKS: BibleBook[] = [
   { id: 'REV', order: 66, nameAm: 'የዮሐንስ ራእይ', nameEn: 'Revelation', nameOriginal: 'Ἀποκάλυψις Ἰωάννου', transliteration: 'Apokalypsis Ioannou', abbrAm: 'ራእ', abbrEn: 'Rev', testament: 'NT', category: 'ትንቢት', originalLang: 'greek', originalLanguageName: 'ግሪክኛ (Ἑλληνική / NA28)', totalChapters: 22 },
 ];
 
+// ፈጣን ፍለጋን (O(1) lookup) ለማረጋገጥ መጻሕፍቱን በ Map ማዋቀር
+const bookMap = new Map<string, BibleBook>(
+  PROTESTANT_BOOKS.map((book) => [book.id.toUpperCase(), book])
+);
+
 export function getBookById(id: string): BibleBook | undefined {
-  return PROTESTANT_BOOKS.find((b) => b.id.toUpperCase() === id.toUpperCase());
+  if (!id) return undefined;
+  return bookMap.get(id.toUpperCase());
 }
 
 export function getBooksByTestament(testament: 'OT' | 'NT'): BibleBook[] {
@@ -103,14 +111,18 @@ export function getBooksByTestament(testament: 'OT' | 'NT'): BibleBook[] {
 }
 
 export function getCachedVerses(bookId: string, chapter: number): BibleVerse[] | null {
+  if (!bookId || !chapter) return null;
+
   const key = `${bookId.toUpperCase()}_${chapter}`;
   const verses = SEED_CHAPTERS[key];
+
   if (!verses || verses.length === 0) return null;
-  
-  // Verify that the verses form a complete chapter
+
+  // የምዕራፉን ትክክለኛ የቁጥር ብዛት በማረጋገጥ ማረጋገጫ መስጠት
   const expectedCount = getExpectedVerseCount(bookId, chapter);
   if (verses.length >= expectedCount) {
     return verses;
   }
+
   return null;
 }
