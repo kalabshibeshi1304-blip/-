@@ -26,10 +26,9 @@ import {
   HighlightColor 
 } from './types';
 import { PROTESTANT_BOOKS, getBookById, getCachedVerses } from './data/bibleData';
-import { getPresetExegesis, generateClientTheologicalAnalysis } from './data/theologyData';
+import { generateClientTheologicalAnalysis } from './data/theologyData';
 import { 
   getOfflineChapter, 
-  saveOfflineChapter, 
   initializeSeedChaptersInOfflineStorage 
 } from './utils/offlineBibleStorage';
 import { fetchAuthenticChapter } from './utils/authenticBibleProvider';
@@ -40,12 +39,11 @@ export default function App() {
   // Security & Device Activation State
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => checkIsUnlocked());
   const [isAdminSecurityOpen, setIsAdminSecurityOpen] = useState<boolean>(false);
-  const [isMasterUser, setIsMasterUser] = useState<boolean>(() => {
+  const [, setIsMasterUser] = useState<boolean>(() => {
     return sessionStorage.getItem('kal_session_is_master') === 'true';
   });
 
   // Navigation & Reading State
-  // Default to Romans (ሮሜ) - the central Protestant book on justification by faith & grace
   const [currentBook, setCurrentBook] = useState<BibleBook>(() => {
     return getBookById('ROM') || PROTESTANT_BOOKS[44];
   });
@@ -60,7 +58,7 @@ export default function App() {
     initializeSeedChaptersInOfflineStorage();
   }, []);
 
-  // Active View Tab (Defaults to bilingual Cover Page)
+  // Active View Tab
   const [activeView, setActiveView] = useState<'cover' | 'reader' | 'analysis' | 'solas' | 'topical' | 'notes'>('cover');
 
   // Display Settings
@@ -68,13 +66,13 @@ export default function App() {
     return localStorage.getItem('berean_parallel_en') === 'true';
   });
   const [fontSize, setFontSize] = useState<'sm' | 'base' | 'lg' | 'xl'>(() => {
-    return (localStorage.getItem('berean_font_size') as any) || 'base';
+    return (localStorage.getItem('berean_font_size') as 'sm' | 'base' | 'lg' | 'xl') || 'base';
   });
   const [fontFamily, setFontFamily] = useState<'serif' | 'sans'>(() => {
-    return (localStorage.getItem('berean_font_family') as any) || 'sans';
+    return (localStorage.getItem('berean_font_family') as 'serif' | 'sans') || 'sans';
   });
 
-  // User Annotations & Persistence
+  // User Annotations & Persistence with Safe Parsing
   const [highlights, setHighlights] = useState<VerseHighlight[]>(() => {
     try {
       const saved = localStorage.getItem('berean_highlights');
@@ -102,17 +100,29 @@ export default function App() {
     }
   });
 
-  // Save changes to localStorage
+  // Save changes to localStorage securely
   useEffect(() => {
-    localStorage.setItem('berean_highlights', JSON.stringify(highlights));
+    try {
+      localStorage.setItem('berean_highlights', JSON.stringify(highlights));
+    } catch (e) {
+      console.error('Failed to save highlights:', e);
+    }
   }, [highlights]);
 
   useEffect(() => {
-    localStorage.setItem('berean_bookmarks', JSON.stringify(bookmarks));
+    try {
+      localStorage.setItem('berean_bookmarks', JSON.stringify(bookmarks));
+    } catch (e) {
+      console.error('Failed to save bookmarks:', e);
+    }
   }, [bookmarks]);
 
   useEffect(() => {
-    localStorage.setItem('berean_notes', JSON.stringify(notes));
+    try {
+      localStorage.setItem('berean_notes', JSON.stringify(notes));
+    } catch (e) {
+      console.error('Failed to save notes:', e);
+    }
   }, [notes]);
 
   useEffect(() => {
@@ -142,7 +152,7 @@ export default function App() {
   const [analysisPassageRef, setAnalysisPassageRef] = useState<string>('ወደ ሮሜ ሰዎች ምዕራፍ 8');
   const [analysisPassageText, setAnalysisPassageText] = useState<string>('እንግዲህ በክርስቶስ ኢየሱስ ላሉት አሁን ኩነኔ የለባቸውም። በክርስቶስ ኢየሱስ ያለው የሕይወት መንፈስ ሕግ ከኃጢአትና ከሞት ሕግ አርነት አውጥቶኛልና።');
   const [analysisContent, setAnalysisContent] = useState<string>(`### 📖 የክፍሉ የታሪክና ሥነ-ጽሑፋዊ አውድ (Historical Context)
-- **ጸሐፊው**: ሐዋርያው ጳውሎስ በቆሮንቶስ በነበረበት ወቅት (በ57 ዓ.ም ገደማ) የጻፈው።
+- **ጸሐፊው**: ሐዋርያው ጳውሎስ በቆሮንቶስ በነበረበት ወቅት (በ57 ዓ.ም ገደማ) ጻፈው።
 - **ተደራሲያን**: በሮም ከተማ ለሚገኙ የአይሁድና የአሕዛብ አማኞች።
 - **የክፍሉ ቁልፍ አውድ**: በምዕራፍ 7 ላይ የተነሣውን የሥጋና የሕግ ትግል ካጠናቀቀ በኋላ፣ በምዕራፍ 8 ላይ በክርስቶስ ኢየሱስ ባገኘነው ፍጹም የጸጋ ነጻነትና በመንፈስ ቅዱስ አዲስ ሕይወት ላይ ያተኩራል።
 
@@ -171,23 +181,20 @@ export default function App() {
   const activeChapterRef = React.useRef({ bookId: currentBook.id, chapter: currentChapter });
   activeChapterRef.current = { bookId: currentBook.id, chapter: currentChapter };
 
-  // Load verses with instant authentic display from Local JSON dataset and seamless background enrichment
+  // Load verses with instant authentic display from Local JSON dataset
   const loadChapterVerses = useCallback(async (book: BibleBook, ch: number) => {
     setVersesError(null);
     activeChapterRef.current = { bookId: book.id, chapter: ch };
 
-    // 1. Immediately retrieve verses from Local JSON database or verified offline cache (0ms instant display)
     const localVerses = getLocalChapterVerses(book.id, ch) || getOfflineChapter(book.id, ch, false);
     if (localVerses && localVerses.length > 0) {
       setVerses(localVerses);
       setIsLoadingVerses(false);
     } else {
-      // Clear previous chapter's verses immediately to prevent leaking stale verses
       setVerses([]);
       setIsLoadingVerses(true);
     }
 
-    // 2. Fetch authentic Amharic chapter from authentic Bible provider
     try {
       const authenticVerses = await fetchAuthenticChapter(book, ch);
       if (
@@ -200,7 +207,7 @@ export default function App() {
         setVersesError(null);
       }
     } catch (_e: any) {
-      // If network fails, keep whatever is already loaded
+      // Retain local verses if network call fails
     } finally {
       if (activeChapterRef.current.bookId === book.id && activeChapterRef.current.chapter === ch) {
         setIsLoadingVerses(false);
@@ -212,14 +219,13 @@ export default function App() {
     loadChapterVerses(currentBook, currentChapter);
   }, [currentBook, currentChapter, loadChapterVerses]);
 
-  // Seamless navigation between chapters and books across the 66 Protestant canon books
+  // Seamless navigation between chapters and books
   const handleNavigateChapter = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
       if (currentChapter > 1) {
         setCurrentChapter((prev) => prev - 1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        // Go to previous canonical book at its last chapter
         const currentIndex = PROTESTANT_BOOKS.findIndex((b) => b.id === currentBook.id);
         if (currentIndex > 0) {
           const prevBook = PROTESTANT_BOOKS[currentIndex - 1];
@@ -233,7 +239,6 @@ export default function App() {
         setCurrentChapter((prev) => prev + 1);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        // Go to next canonical book at chapter 1
         const currentIndex = PROTESTANT_BOOKS.findIndex((b) => b.id === currentBook.id);
         if (currentIndex < PROTESTANT_BOOKS.length - 1) {
           const nextBook = PROTESTANT_BOOKS[currentIndex + 1];
@@ -245,7 +250,6 @@ export default function App() {
     }
   };
 
-  // Select a specific book and chapter
   const handleSelectBookAndChapter = (book: BibleBook, chapter: number) => {
     const validChapter = Math.min(Math.max(1, chapter), book.totalChapters);
     setCurrentBook(book);
@@ -270,53 +274,31 @@ export default function App() {
     setIsLoadingAnalysis(true);
     setAnalysisError(null);
 
-    // Fetch helper with retry
-    const fetchAnalysisWithRetry = async (retriesLeft = 1): Promise<any> => {
-      try {
-        const response = await fetch('/api/theology/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            book: currentBook.nameAm,
-            chapter: currentChapter,
-            verseStart,
-            verseEnd,
-            passageText: customPassageText,
-            analysisType,
-          }),
-        });
-
-        if (response.ok) {
-          return await response.json();
-        }
-
-        if (retriesLeft > 0 && (response.status >= 500 || response.status === 429)) {
-          await new Promise((r) => setTimeout(r, 1000));
-          return await fetchAnalysisWithRetry(retriesLeft - 1);
-        }
-
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.message || errData.error || 'Server error');
-      } catch (err: any) {
-        if (retriesLeft > 0 && (err.name === 'TypeError' || err.message?.includes('fetch'))) {
-          await new Promise((r) => setTimeout(r, 1000));
-          return await fetchAnalysisWithRetry(retriesLeft - 1);
-        }
-        throw err;
-      }
-    };
-
     try {
-      const data = await fetchAnalysisWithRetry(1);
-      if (data && data.analysis) {
-        setAnalysisContent(data.analysis);
-        setAnalysisError(null);
-      } else {
-        throw new Error('Empty analysis received');
+      const response = await fetch('/api/theology/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          book: currentBook.nameAm,
+          chapter: currentChapter,
+          verseStart,
+          verseEnd,
+          passageText: customPassageText,
+          analysisType,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.analysis) {
+          setAnalysisContent(data.analysis);
+          setIsLoadingAnalysis(false);
+          return;
+        }
       }
-    } catch (err: any) {
-      console.warn('Notice: Using robust fallback for theological analysis:', err?.message || err);
-      // Generate full, Christ-centered theological analysis locally
+      throw new Error('Server analysis response invalid');
+    } catch (_err: any) {
+      // Fallback to client-side robust theological analysis generation
       const fallbackAnalysis = generateClientTheologicalAnalysis(
         currentBook.nameAm,
         currentBook.id,
@@ -412,13 +394,11 @@ export default function App() {
     setHighlights((prev) => prev.filter((h) => h.id !== id));
   };
 
-  // Open note modal for specific verse
   const handleOpenAddNote = (verseNum: number) => {
     setSelectedVerseForNote(verseNum);
     setIsAddNoteOpen(true);
   };
 
-  // Open assistant with query
   const handleOpenAssistantWithQuery = (prompt: string) => {
     setAssistantPrompt(prompt);
     setIsAssistantOpen(true);
@@ -569,7 +549,7 @@ export default function App() {
         )}
       </main>
 
-      {/* Floating Book Selector Modal */}
+      {/* Modals and Overlays */}
       <BookSelectorModal
         isOpen={isBookSelectorOpen}
         onClose={() => setIsBookSelectorOpen(false)}
@@ -578,13 +558,11 @@ export default function App() {
         onSelectBookAndChapter={handleSelectBookAndChapter}
       />
 
-      {/* Daily Devotional Modal */}
       <DailyDevotionalModal
         isOpen={isDevotionalOpen}
         onClose={() => setIsDevotionalOpen(false)}
       />
 
-      {/* Search Modal */}
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
@@ -595,7 +573,6 @@ export default function App() {
         }}
       />
 
-      {/* Add Note Modal */}
       <AddNoteModal
         isOpen={isAddNoteOpen}
         onClose={() => setIsAddNoteOpen(false)}
@@ -605,7 +582,6 @@ export default function App() {
         onSaveNote={handleSaveNote}
       />
 
-      {/* Theology AI Chat Assistant Drawer */}
       <TheologyChatDrawer
         isOpen={isAssistantOpen}
         onClose={() => setIsAssistantOpen(false)}
@@ -613,7 +589,6 @@ export default function App() {
         initialPrompt={assistantPrompt}
       />
 
-      {/* Offline Storage Management Modal */}
       <OfflineStorageModal
         isOpen={isOfflineStorageOpen}
         onClose={() => setIsOfflineStorageOpen(false)}
@@ -627,10 +602,8 @@ export default function App() {
         highlightsCount={highlights.length}
       />
 
-      {/* Real-time Offline & Online Status Floating Indicator */}
       <OfflineIndicator onOpenOfflineManager={() => setIsOfflineStorageOpen(true)} />
 
-      {/* Security Gate / Passcode Lock Screen for New Devices or Locked State */}
       <SecurityGateModal
         isOpen={!isUnlocked}
         onUnlocked={(isMaster) => {
@@ -639,7 +612,6 @@ export default function App() {
         }}
       />
 
-      {/* Admin / Owner Security & Access Management Modal */}
       <AdminSecurityModal
         isOpen={isAdminSecurityOpen}
         onClose={() => setIsAdminSecurityOpen(false)}
