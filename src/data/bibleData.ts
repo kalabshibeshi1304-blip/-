@@ -96,7 +96,6 @@ export const PROTESTANT_BOOKS: BibleBook[] = [
   { id: 'REV', order: 66, nameAm: 'የዮሐንስ ራእይ', nameEn: 'Revelation', nameOriginal: 'Ἀποκάλυψις Ἰωάννου', transliteration: 'Apokalypsis Ioannou', abbrAm: 'ራእ', abbrEn: 'Rev', testament: 'NT', category: 'ትንቢት', originalLang: 'greek', originalLanguageName: 'ግሪክኛ (Ἑλληνική / NA28)', totalChapters: 22 },
 ];
 
-// ፈጣን ፍለጋን (O(1) lookup) ለማረጋገጥ መጻሕፍቱን በ Map ማዋቀር
 const bookMap = new Map<string, BibleBook>(
   PROTESTANT_BOOKS.map((book) => [book.id.toUpperCase(), book])
 );
@@ -118,7 +117,6 @@ export function getCachedVerses(bookId: string, chapter: number): BibleVerse[] |
 
   if (!verses || verses.length === 0) return null;
 
-  // የምዕራፉን ትክክለኛ የቁጥር ብዛት በማረጋገጥ ማረጋገጫ መስጠት
   const expectedCount = getExpectedVerseCount(bookId, chapter);
   if (verses.length >= expectedCount) {
     return verses;
