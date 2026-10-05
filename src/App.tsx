@@ -36,14 +36,12 @@ import { getLocalChapterVerses } from './data/localBibleDatabase';
 import { checkIsUnlocked } from './utils/securityManager';
 
 export default function App() {
-  // Security & Device Activation State
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => checkIsUnlocked());
   const [isAdminSecurityOpen, setIsAdminSecurityOpen] = useState<boolean>(false);
   const [, setIsMasterUser] = useState<boolean>(() => {
     return sessionStorage.getItem('kal_session_is_master') === 'true';
   });
 
-  // Navigation & Reading State
   const [currentBook, setCurrentBook] = useState<BibleBook>(() => {
     return getBookById('ROM') || PROTESTANT_BOOKS[44];
   });
@@ -53,15 +51,12 @@ export default function App() {
   });
   const [isLoadingVerses, setIsLoadingVerses] = useState<boolean>(false);
 
-  // Pre-initialize seed chapters in offline store on mount
   useEffect(() => {
     initializeSeedChaptersInOfflineStorage();
   }, []);
 
-  // Active View Tab
   const [activeView, setActiveView] = useState<'cover' | 'reader' | 'analysis' | 'solas' | 'topical' | 'notes'>('cover');
 
-  // Display Settings
   const [showEnglishParallel, setShowEnglishParallel] = useState<boolean>(() => {
     return localStorage.getItem('berean_parallel_en') === 'true';
   });
@@ -72,7 +67,6 @@ export default function App() {
     return (localStorage.getItem('berean_font_family') as 'serif' | 'sans') || 'sans';
   });
 
-  // User Annotations & Persistence with Safe Parsing
   const [highlights, setHighlights] = useState<VerseHighlight[]>(() => {
     try {
       const saved = localStorage.getItem('berean_highlights');
@@ -100,7 +94,6 @@ export default function App() {
     }
   });
 
-  // Save changes to localStorage securely
   useEffect(() => {
     try {
       localStorage.setItem('berean_highlights', JSON.stringify(highlights));
@@ -137,7 +130,6 @@ export default function App() {
     localStorage.setItem('berean_font_family', fontFamily);
   }, [fontFamily]);
 
-  // Modals state
   const [isBookSelectorOpen, setIsBookSelectorOpen] = useState<boolean>(false);
   const [isDevotionalOpen, setIsDevotionalOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
@@ -147,7 +139,6 @@ export default function App() {
   const [selectedVerseForNote, setSelectedVerseForNote] = useState<number | undefined>();
   const [assistantPrompt, setAssistantPrompt] = useState<string>('');
 
-  // Theological Analysis State
   const [analysisType, setAnalysisType] = useState<AnalysisType>('depth');
   const [analysisPassageRef, setAnalysisPassageRef] = useState<string>('ወደ ሮሜ ሰዎች ምዕራፍ 8');
   const [analysisPassageText, setAnalysisPassageText] = useState<string>('እንግዲህ በክርስቶስ ኢየሱስ ላሉት አሁን ኩነኔ የለባቸውም። በክርስቶስ ኢየሱስ ያለው የሕይወት መንፈስ ሕግ ከኃጢአትና ከሞት ሕግ አርነት አውጥቶኛልና።');
@@ -177,11 +168,9 @@ export default function App() {
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [versesError, setVersesError] = useState<string | null>(null);
 
-  // Ref to track the current active book & chapter to prevent async race conditions
   const activeChapterRef = React.useRef({ bookId: currentBook.id, chapter: currentChapter });
   activeChapterRef.current = { bookId: currentBook.id, chapter: currentChapter };
 
-  // Load verses with instant authentic display from Local JSON dataset
   const loadChapterVerses = useCallback(async (book: BibleBook, ch: number) => {
     setVersesError(null);
     activeChapterRef.current = { bookId: book.id, chapter: ch };
@@ -219,7 +208,6 @@ export default function App() {
     loadChapterVerses(currentBook, currentChapter);
   }, [currentBook, currentChapter, loadChapterVerses]);
 
-  // Seamless navigation between chapters and books
   const handleNavigateChapter = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
       if (currentChapter > 1) {
@@ -258,7 +246,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Trigger Theological Analysis
   const handleTriggerTheologicalAnalysis = async (
     verseStart?: number, 
     verseEnd?: number, 
@@ -298,7 +285,6 @@ export default function App() {
       }
       throw new Error('Server analysis response invalid');
     } catch (_err: any) {
-      // Fallback to client-side robust theological analysis generation
       const fallbackAnalysis = generateClientTheologicalAnalysis(
         currentBook.nameAm,
         currentBook.id,
@@ -314,7 +300,6 @@ export default function App() {
     }
   };
 
-  // Highlight actions
   const handleAddHighlight = (verseNum: number, color: HighlightColor) => {
     const id = `${currentBook.id}_${currentChapter}_${verseNum}`;
     setHighlights((prev) => {
@@ -338,7 +323,6 @@ export default function App() {
     setHighlights((prev) => prev.filter((h) => h.id !== id));
   };
 
-  // Bookmark actions
   const handleToggleBookmark = (verseNum: number, previewText: string) => {
     const id = `${currentBook.id}_${currentChapter}_${verseNum}`;
     const exists = bookmarks.some((b) => b.id === id);
@@ -360,7 +344,6 @@ export default function App() {
     }
   };
 
-  // Notes actions
   const handleSaveNote = (
     title: string, 
     content: string, 
@@ -406,7 +389,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-ethiopic-sans selection:bg-amber-600/30 selection:text-amber-200">
-      {/* Sticky Header Navigation */}
       <Navbar
         currentBook={currentBook}
         currentChapter={currentChapter}
@@ -429,7 +411,6 @@ export default function App() {
         onToggleFontFamily={() => setFontFamily((prev) => (prev === 'serif' ? 'sans' : 'serif'))}
       />
 
-      {/* Main View Display Container */}
       <main className="flex-1 pb-16">
         {activeView === 'cover' && (
           <CoverPageView
@@ -549,7 +530,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Modals and Overlays */}
       <BookSelectorModal
         isOpen={isBookSelectorOpen}
         onClose={() => setIsBookSelectorOpen(false)}
