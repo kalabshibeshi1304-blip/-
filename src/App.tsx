@@ -32,7 +32,6 @@ import {
   initializeSeedChaptersInOfflineStorage 
 } from './utils/offlineBibleStorage';
 import { fetchAuthenticChapter } from './utils/authenticBibleProvider';
-import { getLocalChapterVerses } from './data/localBibleDatabase';
 import { checkIsUnlocked } from './utils/securityManager';
 
 export default function App() {
